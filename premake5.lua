@@ -82,7 +82,7 @@ solution "sdl2template"
 		print("OS is:", os.get())
 		if os.get() == "windows" then
 			print("Copying binaries for Windows ...")
-
+			os.mkdir (binPath)
 			-- SDL2
 			print("  ... SDL2")
 			os.copyfile("./graphics_dependencies/SDL2/lib/win32/SDL2.dll", path.join(binPath, "SDL2.dll"))
