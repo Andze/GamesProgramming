@@ -2,7 +2,8 @@
 #include <vector>
 #include <algorithm>
 #include <string>
-
+#include "common.h"
+#include "Sprite.h"
 
 #ifdef _WIN32 // compiling on windows
 #include <SDL.h>
@@ -15,6 +16,8 @@
 #include <SDL2/SDL_ttf.h>
 #endif
 
+using namespace std;
+
 std::string exeName;
 SDL_Window *win; //pointer to the SDL_Window
 SDL_Renderer *ren; //pointer to the SDL_Renderer
@@ -25,6 +28,8 @@ SDL_Texture *messageTexture; //pointer to the SDL_Texture for message
 SDL_Rect message_rect; //SDL_rect for the message
 
 bool done = false;
+
+std::vector<unique_ptr<Sprite>> spriteList;
 
 void handleInput()
 {
@@ -81,6 +86,12 @@ void render()
 
 		//Draw the texture
 		SDL_RenderCopy(ren, tex, NULL, NULL);
+
+		//Draw Sprites in sprite list
+		for (auto const& sprite : spriteList) //unique_ptr can't be copied, so use reference
+		{
+			SDL_RenderCopy(ren, tex, NULL, &sprite->rectangle);
+		}
 
 		//Draw the text
 		SDL_RenderCopy(ren, messageTexture, NULL, &message_rect);
@@ -141,7 +152,6 @@ int main( int argc, char* args[] )
 		cleanExit(1);
 	}
 
-
 	if( TTF_Init() == -1 )
 	{
 		std::cout << "TTF_Init Failed: " << TTF_GetError() << std::endl;
@@ -154,6 +164,7 @@ int main( int argc, char* args[] )
 		std::cout << "TTF_OpenFont Error: " << TTF_GetError() << std::endl;
 		cleanExit(1);
 	}
+
 	SDL_Color White = {255, 255, 255};
 	messageSurface = TTF_RenderText_Solid(sans, "Hello World!", White);
 	messageTexture = SDL_CreateTextureFromSurface(ren, messageSurface);
@@ -161,6 +172,15 @@ int main( int argc, char* args[] )
 	message_rect.y = 0;
 	message_rect.w = 300;
 	message_rect.h = 100;
+
+
+	//Add Sprites to SpriteList
+	SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO, "Adding sprites...");
+	//Adding Sprites to list with uniquie pointer and X,Y,W,H
+	spriteList.push_back(std::unique_ptr<Sprite>(new Sprite(0, 0, 200, 86)));
+	spriteList.push_back(std::unique_ptr<Sprite>(new Sprite(200, 200, 200, 86)));
+
+	SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO, "Sprites added");
 
 	while (!done) //loop until done flag is set)
 	{
