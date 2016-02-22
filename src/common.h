@@ -5,3 +5,5 @@
 #include <string>
 #include <memory>
 #include <SDL.h>
+#include <chrono>
+typedef std::chrono::high_resolution_clock Clock;

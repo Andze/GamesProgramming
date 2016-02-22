@@ -130,8 +130,14 @@ int main( int argc, char* args[] )
 		cleanExit(1);
 	}
 	std::cout << "SDL CreatedWindow OK!\n";
+	
 
+	//turning V Sync On 
 	ren = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+
+	//Turning V Sync off
+	//ren = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED );
+
 	if (ren == nullptr)
 	{
 		std::cout << "SDL_CreateRenderer Error: " << SDL_GetError() << std::endl;
@@ -182,15 +188,27 @@ int main( int argc, char* args[] )
 
 	SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO, "Sprites added");
 
+	//auto t1 = Clock::now();
+	//auto t2 = Clock::now();
+	/*std::cout << "Delta t2-t1: "
+		<< std::chrono::duration_cast<std::chrono::nanoseconds>(t2 - t1).count()
+		<< " nanoseconds" << std::endl;*/
+
 	while (!done) //loop until done flag is set)
+
 	{
+		auto t1 = Clock::now();
 		handleInput(); // this should ONLY SET VARIABLES
 
 		updateSimulation(); // this should ONLY SET VARIABLES according to simulation
 
 		render(); // this should render the world state according to VARIABLES
 
-		SDL_Delay(20); // unless vsync is on??
+		//SDL_Delay(20); // unless vsync is on??
+		auto t2 = Clock::now();
+		std::cout << "Delta t2-t1: "
+			<< std::chrono::duration_cast<std::chrono::nanoseconds>(t2 - t1).count()
+			<< " nanoseconds" << std::endl;
 	}
 
 	cleanExit(0);

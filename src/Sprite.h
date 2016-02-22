@@ -4,7 +4,8 @@
 
 #include "common.h"
 
-#endif /* end of include guard: */
+#endif /* end of include guard: */
+
 class Sprite
 {
 public:
