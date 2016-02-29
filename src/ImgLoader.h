@@ -4,6 +4,8 @@
 
 #include "common.h"
 
+#endif /* end of include guard: */
+
 class ImgLoader
 {
 public:

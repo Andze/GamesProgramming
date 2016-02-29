@@ -89,9 +89,10 @@ void render()
 		SDL_RenderCopy(ren, tex, NULL, NULL);
 
 		//Draw Sprites in sprite list
-		for (auto const& sprite : spriteList) //unique_ptr can't be copied, so use reference
+		for (auto const& spriteKv : spriteList) //unique_ptr can't be copied, so use reference
 		{
-			SDL_RenderCopy(ren, tex, NULL, &sprite->rectangle);
+			//sprite &thisSprite = spriteKv.second
+			SDL_RenderCopy(ren, tex, NULL, &spriteKv.second->rectangle);
 		}
 
 		//Draw the text
@@ -188,8 +189,9 @@ int main( int argc, char* args[] )
 	//Adding Sprites to list with uniquie pointer and X,Y,W,H
 	//spriteList.insert(std::unique_ptr<Sprite>(new Sprite(0, 0, 200, 86)));
 	//spriteList.insert(std::unique_ptr<Sprite>(new Sprite(200, 200, 200, 86)));
-	spriteList.insert(std::pair<string, unique_ptr<Sprite>>("Sprite1", std::unique_ptr<Sprite>(new Sprite(0, 0, 200, 86))));
-	spriteList.insert(std::pair<string,unique_ptr<Sprite>>("Sprite1", std::unique_ptr<Sprite>(new Sprite(200, 200, 200, 86))));
+	spriteList.emplace("Sprite1", std::unique_ptr<Sprite>(new Sprite(0, 0, 200, 86)));
+	spriteList.emplace("Sprite2", std::unique_ptr<Sprite>(new Sprite(200, 200, 200, 86)));
+
 
 	SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO, "Sprites added");
 
