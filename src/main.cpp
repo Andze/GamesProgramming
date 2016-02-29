@@ -29,7 +29,8 @@ SDL_Rect message_rect; //SDL_rect for the message
 
 bool done = false;
 
-std::vector<unique_ptr<Sprite>> spriteList;
+//std::vector<unique_ptr<Sprite>> spriteList;
+std::map<string, unique_ptr<Sprite>> spriteList;
 
 void handleInput()
 {
@@ -144,6 +145,7 @@ int main( int argc, char* args[] )
 		cleanExit(1);
 	}
 
+	//Load Img
 	std::string imagePath = "./assets/Opengl-logo.svg.png";
 	surface = IMG_Load(imagePath.c_str());
 	if (surface == nullptr){
@@ -158,6 +160,7 @@ int main( int argc, char* args[] )
 		cleanExit(1);
 	}
 
+	//Load Font
 	if( TTF_Init() == -1 )
 	{
 		std::cout << "TTF_Init Failed: " << TTF_GetError() << std::endl;
@@ -183,11 +186,14 @@ int main( int argc, char* args[] )
 	//Add Sprites to SpriteList
 	SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO, "Adding sprites...");
 	//Adding Sprites to list with uniquie pointer and X,Y,W,H
-	spriteList.push_back(std::unique_ptr<Sprite>(new Sprite(0, 0, 200, 86)));
-	spriteList.push_back(std::unique_ptr<Sprite>(new Sprite(200, 200, 200, 86)));
+	//spriteList.insert(std::unique_ptr<Sprite>(new Sprite(0, 0, 200, 86)));
+	//spriteList.insert(std::unique_ptr<Sprite>(new Sprite(200, 200, 200, 86)));
+	spriteList.insert(std::pair<string, unique_ptr<Sprite>>("Sprite1", std::unique_ptr<Sprite>(new Sprite(0, 0, 200, 86))));
+	spriteList.insert(std::pair<string,unique_ptr<Sprite>>("Sprite1", std::unique_ptr<Sprite>(new Sprite(200, 200, 200, 86))));
 
 	SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO, "Sprites added");
 
+	//			Timer
 	//auto t1 = Clock::now();
 	//auto t2 = Clock::now();
 	/*std::cout << "Delta t2-t1: "
@@ -197,18 +203,14 @@ int main( int argc, char* args[] )
 	while (!done) //loop until done flag is set)
 
 	{
-		auto t1 = Clock::now();
+		
 		handleInput(); // this should ONLY SET VARIABLES
 
 		updateSimulation(); // this should ONLY SET VARIABLES according to simulation
 
 		render(); // this should render the world state according to VARIABLES
 
-		//SDL_Delay(20); // unless vsync is on??
-		auto t2 = Clock::now();
-		std::cout << "Delta t2-t1: "
-			<< std::chrono::duration_cast<std::chrono::nanoseconds>(t2 - t1).count()
-			<< " nanoseconds" << std::endl;
+		SDL_Delay(20); // unless vsync is on??
 	}
 
 	cleanExit(0);
