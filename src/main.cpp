@@ -1,7 +1,4 @@
-#include <iostream>
-#include <vector>
-#include <algorithm>
-#include <string>
+
 #include "common.h"
 #include "Sprite.h"
 
@@ -200,7 +197,8 @@ int main( int argc, char* args[] )
 	//auto t2 = Clock::now();
 	/*std::cout << "Delta t2-t1: "
 		<< std::chrono::duration_cast<std::chrono::nanoseconds>(t2 - t1).count()
-		<< " nanoseconds" << std::endl;*/
+		<< " nanoseconds" << std::endl;*/
+
 
 	while (!done) //loop until done flag is set)
 
