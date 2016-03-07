@@ -8,6 +8,5 @@
 #include <chrono>
 typedef std::chrono::high_resolution_clock Clock;
 #include <map>
-#include <SDL_image.h>
 #include <SDL_mixer.h>
 #include <stdio.h>

@@ -29,6 +29,15 @@ bool done = false;
 //std::vector<unique_ptr<Sprite>> spriteList;
 std::map<string, unique_ptr<Sprite>> spriteList;
 
+//The music that will be played
+Mix_Music *gMusic = NULL;
+
+//The sound effects that will be used
+Mix_Chunk *gScratch = NULL;
+Mix_Chunk *gHigh = NULL;
+Mix_Chunk *gMedium = NULL;
+Mix_Chunk *gLow = NULL;
+
 void handleInput()
 {
 	//Event-based input handling
@@ -64,6 +73,30 @@ void handleInput()
 				{
 					//hit escape to exit
 					case SDLK_ESCAPE: done = true;
+
+					case SDLK_9:
+						//If there is no music playing
+						if (Mix_PlayingMusic() == 0)
+						{
+							//Play the music
+							Mix_PlayMusic(gMusic, -1);
+						}
+						//If music is being played
+						else
+						{
+							//If the music is paused
+							if (Mix_PausedMusic() == 1)
+							{
+								//Resume the music
+								Mix_ResumeMusic();
+							}
+							//If the music is playing
+							else
+							{
+								//Pause the music
+								Mix_PauseMusic();
+							}
+						}
 				}
 			break;
 		}
@@ -105,6 +138,21 @@ void cleanExit(int returnValue)
 	if (tex != nullptr) SDL_DestroyTexture(tex);
 	if (ren != nullptr) SDL_DestroyRenderer(ren);
 	if (win != nullptr) SDL_DestroyWindow(win);
+
+	//Free the sound effects
+	Mix_FreeChunk(gScratch);
+	Mix_FreeChunk(gHigh);
+	Mix_FreeChunk(gMedium);
+	Mix_FreeChunk(gLow);
+	gScratch = NULL;
+	gHigh = NULL;
+	gMedium = NULL;
+	gLow = NULL;
+
+	//Free the music
+	Mix_FreeMusic(gMusic);
+	gMusic = NULL;
+
 	SDL_Quit();
 	exit(returnValue);
 }
@@ -136,6 +184,23 @@ int main( int argc, char* args[] )
 
 	//Turning V Sync off
 	//ren = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED );
+
+	//Initialize SDL_mixer
+	//Sound Frequency, Sample format, Hardware channels
+	if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0)
+	{
+		std::cout <<"SDL_mixer could not initialize! SDL_mixer Error: %s\n" << Mix_GetError() << std::endl;
+		cleanExit(1);
+	}
+	//Load music
+    std::string MusicPath = "./assets/Music.mp3";
+	gMusic = Mix_LoadMUS(MusicPath.c_str());
+	if (gMusic == NULL)
+	{
+		printf("Failed to load music! SDL_mixer Error: %s\n", Mix_GetError());
+		cleanExit(1);
+	}
+
 
 	if (ren == nullptr)
 	{
@@ -202,8 +267,7 @@ int main( int argc, char* args[] )
 
 	while (!done) //loop until done flag is set)
 
-	{
-		
+	{	
 		handleInput(); // this should ONLY SET VARIABLES
 
 		updateSimulation(); // this should ONLY SET VARIABLES according to simulation
