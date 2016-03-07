@@ -3,16 +3,16 @@ http://open.commonly.cc
 
 - - -
 
-This package contains the original soundtracks from:
-1. Adventure Story - http://www.kongregate.com/games/kupo707/adventure-story
-2. Bullet Heaven - http://www.kongregate.com/games/kupo707/bullet-heaven
-3. Epic Battle Fantasy III - http://www.kongregate.com/games/kupo707/epic-battle-fantasy-3
+This package contains the following albums & collections:
+1. Daydream Anatomy (Album)
+2. 8-Bit Heroes (Album)
+3. Misc background music and loops
+4. MIDI versions of the other tracks, to help you remix them!
 
-All music is by HalcyonicFalconX, the musician behind the Epic Battle Fantasy series.
-A parody of Final Fantasy classics, EBF brings together all that is great about 
-the old games and various anime sources. She is also making a new High Fantasy 
-retro-style RPG called Kobold Conquest, due to be released sometime next year.
+All music is by Stratkat, whose music has been featured in
+Beat Hazard Ultra, Unplugged (Xbox Live Arcade),
+and Symphonic Tower Defense: Halloween Edition.
 
-Bandcamp: halcyonicFalconX.bandcamp.com
-Facebook: www.facebook.com/HalcyonicFalconX
-Twitter: @Phyrnna 
+Bandcamp: http://daydreamanatomy.bandcamp.com/
+Youtube: http://www.youtube.com/user/quixoticnostalgic 
+Tumblr: http://daydreamanatomy.tumblr.com/ 

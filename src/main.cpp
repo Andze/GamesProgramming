@@ -74,6 +74,26 @@ void handleInput()
 					//hit escape to exit
 					case SDLK_ESCAPE: done = true;
 
+						//Play high sound effect
+					case SDLK_1:
+						Mix_PlayChannel(-1, Effect1, 0);
+						break;
+
+						//Play medium sound effect
+					case SDLK_2:
+						Mix_PlayChannel(-1, Effect2, 0);
+						break;
+
+						//Play low sound effect
+					case SDLK_3:
+						Mix_PlayChannel(-1, Effect3, 0);
+						break;
+
+						//Play scratch sound effect
+					case SDLK_4:
+						Mix_PlayChannel(-1, Effect4, 0);
+						break;
+
 					case SDLK_9:
 						//If there is no music playing
 						if (Mix_PlayingMusic() == 0)
@@ -189,7 +209,7 @@ int main( int argc, char* args[] )
 
 
 
-	//Initialize SDL_mixer
+	//Initialize SDL_mixer http://lazyfoo.net/tutorials/SDL/21_sound_effects_and_music/index.php
 	//Sound Frequency, Sample format, Hardware channels
 	if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0)
 	{
@@ -198,13 +218,16 @@ int main( int argc, char* args[] )
 	}
 
 	//Load music http://open.commonly.cc/
-    std::string MusicPath = "./assets/Music2.mp3";
+    std::string MusicPath = "./assets/Sound/Music.mp3";
 	gMusic = Mix_LoadMUS(MusicPath.c_str());
 	if (gMusic == NULL)
 	{
 		printf("Failed to load music! SDL_mixer Error: %s\n", Mix_GetError());
 		cleanExit(1);
 	}
+
+	//Load in effects
+	//Then make a music Class
 
 
 
@@ -217,7 +240,7 @@ int main( int argc, char* args[] )
 	}
 
 	//Load Img
-	std::string imagePath = "./assets/Opengl-logo.svg.png";
+	std::string imagePath = "./assets/Imgs/Opengl-logo.svg.png";
 	surface = IMG_Load(imagePath.c_str());
 	if (surface == nullptr){
 		std::cout << "SDL IMG_Load Error: " << SDL_GetError() << std::endl;
@@ -238,7 +261,7 @@ int main( int argc, char* args[] )
 		cleanExit(1);
 	}
 
-	TTF_Font* sans = TTF_OpenFont("./assets/Hack-Regular.ttf", 96);
+	TTF_Font* sans = TTF_OpenFont("./assets/Fonts/Hack-Regular.ttf", 96);
 	if (sans == nullptr)
 	{
 		std::cout << "TTF_OpenFont Error: " << TTF_GetError() << std::endl;
