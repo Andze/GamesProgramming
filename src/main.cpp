@@ -33,10 +33,10 @@ std::map<string, unique_ptr<Sprite>> spriteList;
 Mix_Music *gMusic = NULL;
 
 //The sound effects that will be used
-Mix_Chunk *gScratch = NULL;
-Mix_Chunk *gHigh = NULL;
-Mix_Chunk *gMedium = NULL;
-Mix_Chunk *gLow = NULL;
+Mix_Chunk *Effect1 = NULL;
+Mix_Chunk *Effect2 = NULL;
+Mix_Chunk *Effect3 = NULL;
+Mix_Chunk *Effect4 = NULL;
 
 void handleInput()
 {
@@ -140,14 +140,15 @@ void cleanExit(int returnValue)
 	if (win != nullptr) SDL_DestroyWindow(win);
 
 	//Free the sound effects
-	Mix_FreeChunk(gScratch);
-	Mix_FreeChunk(gHigh);
-	Mix_FreeChunk(gMedium);
-	Mix_FreeChunk(gLow);
-	gScratch = NULL;
-	gHigh = NULL;
-	gMedium = NULL;
-	gLow = NULL;
+	Mix_FreeChunk(Effect1);
+	Mix_FreeChunk(Effect2);
+	Mix_FreeChunk(Effect3);
+	Mix_FreeChunk(Effect4);
+
+	Effect1 = NULL;
+	Effect2 = NULL;
+	Effect3 = NULL;
+	Effect4 = NULL;
 
 	//Free the music
 	Mix_FreeMusic(gMusic);
@@ -185,6 +186,9 @@ int main( int argc, char* args[] )
 	//Turning V Sync off
 	//ren = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED );
 
+
+
+
 	//Initialize SDL_mixer
 	//Sound Frequency, Sample format, Hardware channels
 	if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0)
@@ -192,14 +196,18 @@ int main( int argc, char* args[] )
 		std::cout <<"SDL_mixer could not initialize! SDL_mixer Error: %s\n" << Mix_GetError() << std::endl;
 		cleanExit(1);
 	}
-	//Load music
-    std::string MusicPath = "./assets/Music.mp3";
+
+	//Load music http://open.commonly.cc/
+    std::string MusicPath = "./assets/Music2.mp3";
 	gMusic = Mix_LoadMUS(MusicPath.c_str());
 	if (gMusic == NULL)
 	{
 		printf("Failed to load music! SDL_mixer Error: %s\n", Mix_GetError());
 		cleanExit(1);
 	}
+
+
+
 
 
 	if (ren == nullptr)
