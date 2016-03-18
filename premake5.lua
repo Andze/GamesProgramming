@@ -36,6 +36,7 @@ solution "sdl2template"
 							"./graphics_dependencies/SDL2_image/include",
 							"./graphics_dependencies/SDL2_ttf/include",
 							"./graphics_dependencies/SDL2_mixer/include",
+							"./graphics_dependencies/SDL2_net/include",
 						 }
 		configuration { "linux" }
 		includedirs {
@@ -59,6 +60,7 @@ solution "sdl2template"
 					"./graphics_dependencies/SDL2_image/lib/x86/",
 					"./graphics_dependencies/SDL2_ttf/lib/x86/",
 					"./graphics_dependencies/SDL2_mixer/lib/x86/",
+					"./graphics_dependencies/SDL2_net/lib/x86/",
 					}
 		configuration "linux"
 					 -- should be installed as in ./graphics_dependencies/README.asciidoc

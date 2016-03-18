@@ -9,4 +9,5 @@
 typedef std::chrono::high_resolution_clock Clock;
 #include <map>
 #include <SDL_mixer.h>
+#include <SDL_net.h>
 #include <stdio.h>
