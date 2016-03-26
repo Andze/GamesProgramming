@@ -21,8 +21,14 @@ SDL_Renderer *ren; //pointer to the SDL_Renderer
 SDL_Surface *surface; //pointer to the SDL_Surface
 SDL_Texture *tex; //pointer to the SDL_Texture
 SDL_Surface *messageSurface; //pointer to the SDL_Surface for message
+SDL_Surface *HighScore; //pointer to the SDL_Surface for message
+SDL_Surface *Score; //pointer to the SDL_Surface for message
 SDL_Texture *messageTexture; //pointer to the SDL_Texture for message
+SDL_Texture *messageTexture1; //pointer to the SDL_Texture for message
+SDL_Texture *messageTexture2; //pointer to the SDL_Texture for message
 SDL_Rect message_rect; //SDL_rect for the message
+SDL_Rect HighScore_rect; //SDL_rect for the message
+SDL_Rect Score_rect; //SDL_rect for the message
 
 bool done = false;
 
@@ -149,6 +155,7 @@ void render()
 
 		//Draw the text
 		SDL_RenderCopy(ren, messageTexture, NULL, &message_rect);
+		SDL_RenderCopy(ren, messageTexture1, NULL, &HighScore_rect);
 
 		//Update the screen
 		SDL_RenderPresent(ren);
@@ -157,6 +164,8 @@ void render()
 void cleanExit(int returnValue)
 {
 	if (messageTexture != nullptr) SDL_DestroyTexture(messageTexture);
+	if (messageTexture1 != nullptr) SDL_DestroyTexture(messageTexture1);
+	if (messageTexture2 != nullptr) SDL_DestroyTexture(messageTexture2);
 	if (tex != nullptr) SDL_DestroyTexture(tex);
 	if (ren != nullptr) SDL_DestroyRenderer(ren);
 	if (win != nullptr) SDL_DestroyWindow(win);
@@ -169,6 +178,7 @@ void cleanExit(int returnValue)
 	Mix_FreeChunk(SFX_EatingGhost);
 	Mix_FreeChunk(SFX_ExtraLife);
 
+	//Set the variables back to empty
 	SFX_OpeningSong = NULL;
 	SFX_WakaWaka = NULL;
 	SFX_Dies = NULL;
@@ -184,47 +194,51 @@ void cleanExit(int returnValue)
 	exit(returnValue);
 }
 
-// based on http://www.willusher.io/sdl2%20tutorials/2013/08/17/lesson-1-hello-world/
-int main( int argc, char* args[] )
+void LoadText()
 {
-	if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
+	//Load Font
+	if (TTF_Init() == -1)
 	{
-		std::cout << "SDL_Init Error: " << SDL_GetError() << std::endl;
+		std::cout << "TTF_Init Failed: " << TTF_GetError() << std::endl;
 		cleanExit(1);
 	}
-	std::cout << "SDL initialised OK!\n";
 
-	//create window
-	win = SDL_CreateWindow("SDL Hello World!", 100, 100, 600, 600, SDL_WINDOW_SHOWN);
-
-	//error handling
-	if (win == nullptr)
+	TTF_Font* sans = TTF_OpenFont("./assets/Fonts/Hack-Regular.ttf", 96);
+	if (sans == nullptr)
 	{
-		std::cout << "SDL_CreateWindow Error: " << SDL_GetError() << std::endl;
+		std::cout << "TTF_OpenFont Error: " << TTF_GetError() << std::endl;
 		cleanExit(1);
 	}
-	std::cout << "SDL CreatedWindow OK!\n";
-	
 
-	//turning V Sync On 
-	ren = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+	//display text
+	SDL_Color White = { 255, 255, 255 };
+	messageSurface = TTF_RenderText_Solid(sans, "High Score", White);
+	messageTexture = SDL_CreateTextureFromSurface(ren, messageSurface);
+	message_rect.x = 325;
+	message_rect.y = 0;
+	message_rect.w = 150;
+	message_rect.h = 40;
 
-	//Turning V Sync off
-	//ren = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED );
+	HighScore = TTF_RenderText_Solid(sans, "000", White);
+	messageTexture1 = SDL_CreateTextureFromSurface(ren, HighScore);
+	HighScore_rect.x = 370;
+	HighScore_rect.y = 45;
+	HighScore_rect.w = 60;
+	HighScore_rect.h = 20;
 
-
-
-
+}
+void LoadSound()
+{
 	//Initialize SDL_mixer http://lazyfoo.net/tutorials/SDL/21_sound_effects_and_music/index.php
 	//Sound Frequency, Sample format, Hardware channels
 	if (Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 2048) < 0)
 	{
-		std::cout <<"SDL_mixer could not initialize! SDL_mixer Error: %s\n" << Mix_GetError() << std::endl;
+		std::cout << "SDL_mixer could not initialize! SDL_mixer Error: %s\n" << Mix_GetError() << std::endl;
 		cleanExit(1);
 	}
 
-	//Load music http://open.commonly.cc/
-    std::string MusicPath = "./assets/Sound/Pacman Siren Clean Loop.mp3";
+	//Load music 
+	std::string MusicPath = "./assets/Sound/Pacman Siren Clean Loop.mp3";
 	gMusic = Mix_LoadMUS(MusicPath.c_str());
 	if (gMusic == NULL)
 	{
@@ -235,7 +249,7 @@ int main( int argc, char* args[] )
 	//Load sound effects
 	std::string OpeningSong = "./assets/Sound/Pacman Opening Song.mp3";
 	SFX_OpeningSong = Mix_LoadWAV(OpeningSong.c_str());
-	if(SFX_OpeningSong == NULL )
+	if (SFX_OpeningSong == NULL)
 	{
 		printf("Failed to load music! SDL_mixer Error: %s\n", Mix_GetError());
 		cleanExit(1);
@@ -266,8 +280,38 @@ int main( int argc, char* args[] )
 		printf("Failed to load music! SDL_mixer Error: %s\n", Mix_GetError());
 		cleanExit(1);
 	}
-	//Then make a music Class
+	
+}
 
+// based on http://www.willusher.io/sdl2%20tutorials/2013/08/17/lesson-1-hello-world/
+int main( int argc, char* args[] )
+{
+	if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
+	{
+		std::cout << "SDL_Init Error: " << SDL_GetError() << std::endl;
+		cleanExit(1);
+	}
+	std::cout << "SDL initialised OK!\n";
+
+	//create window
+	win = SDL_CreateWindow("Pacman", 100, 100, 800, 800, SDL_WINDOW_SHOWN);
+
+	//error handling
+	if (win == nullptr)
+	{
+		std::cout << "SDL_CreateWindow Error: " << SDL_GetError() << std::endl;
+		cleanExit(1);
+	}
+	std::cout << "SDL CreatedWindow OK!\n";
+	
+
+	//turning V Sync On 
+	ren = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+
+	//Turning V Sync off
+	//ren = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED );
+	
+	
 
 	if (ren == nullptr)
 	{
@@ -290,27 +334,7 @@ int main( int argc, char* args[] )
 		cleanExit(1);
 	}
 
-	//Load Font
-	if( TTF_Init() == -1 )
-	{
-		std::cout << "TTF_Init Failed: " << TTF_GetError() << std::endl;
-		cleanExit(1);
-	}
-
-	TTF_Font* sans = TTF_OpenFont("./assets/Fonts/Hack-Regular.ttf", 96);
-	if (sans == nullptr)
-	{
-		std::cout << "TTF_OpenFont Error: " << TTF_GetError() << std::endl;
-		cleanExit(1);
-	}
-
-	SDL_Color White = {255, 255, 255};
-	messageSurface = TTF_RenderText_Solid(sans, "Hello World!", White);
-	messageTexture = SDL_CreateTextureFromSurface(ren, messageSurface);
-	message_rect.x = 0;
-	message_rect.y = 0;
-	message_rect.w = 300;
-	message_rect.h = 100;
+	
 
 
 	//Add Sprites to SpriteList
@@ -321,8 +345,9 @@ int main( int argc, char* args[] )
 	spriteList.emplace("Sprite1", std::unique_ptr<Sprite>(new Sprite(0, 0, 200, 86)));
 	spriteList.emplace("Sprite2", std::unique_ptr<Sprite>(new Sprite(200, 200, 200, 86)));
 
-
 	SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO, "Sprites added");
+
+	
 
 	//			Timer
 	//auto t1 = Clock::now();
@@ -331,6 +356,9 @@ int main( int argc, char* args[] )
 		<< std::chrono::duration_cast<std::chrono::nanoseconds>(t2 - t1).count()
 		<< " nanoseconds" << std::endl;*/
 
+	LoadText();
+
+	LoadSound();
 
 	while (!done) //loop until done flag is set)
 
