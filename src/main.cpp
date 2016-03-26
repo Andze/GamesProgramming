@@ -33,10 +33,12 @@ std::map<string, unique_ptr<Sprite>> spriteList;
 Mix_Music *gMusic = NULL;
 
 //The sound effects that will be used
-Mix_Chunk *Effect1 = NULL;
-Mix_Chunk *Effect2 = NULL;
-Mix_Chunk *Effect3 = NULL;
-Mix_Chunk *Effect4 = NULL;
+Mix_Chunk *SFX_OpeningSong = NULL;
+Mix_Chunk *SFX_WakaWaka = NULL;
+Mix_Chunk *SFX_Dies = NULL;
+Mix_Chunk *SFX_Cherry = NULL;
+Mix_Chunk *SFX_EatingGhost = NULL;
+Mix_Chunk *SFX_ExtraLife = NULL;
 
 void handleInput()
 {
@@ -76,22 +78,22 @@ void handleInput()
 
 						//Play high sound effect
 					case SDLK_1:
-						Mix_PlayChannel(-1, Effect1, 0);
+						Mix_PlayChannel(-1, SFX_OpeningSong, 0);
 						break;
 
 						//Play medium sound effect
 					case SDLK_2:
-						Mix_PlayChannel(-1, Effect2, 0);
+						Mix_PlayChannel(-1, SFX_WakaWaka, 0);
 						break;
 
 						//Play low sound effect
 					case SDLK_3:
-						Mix_PlayChannel(-1, Effect3, 0);
+						Mix_PlayChannel(-1, SFX_Dies, 0);
 						break;
 
 						//Play scratch sound effect
 					case SDLK_4:
-						Mix_PlayChannel(-1, Effect4, 0);
+						Mix_PlayChannel(-1, SFX_Cherry, 0);
 						break;
 
 					case SDLK_9:
@@ -160,15 +162,19 @@ void cleanExit(int returnValue)
 	if (win != nullptr) SDL_DestroyWindow(win);
 
 	//Free the sound effects
-	Mix_FreeChunk(Effect1);
-	Mix_FreeChunk(Effect2);
-	Mix_FreeChunk(Effect3);
-	Mix_FreeChunk(Effect4);
+	Mix_FreeChunk(SFX_OpeningSong);
+	Mix_FreeChunk(SFX_WakaWaka);
+	Mix_FreeChunk(SFX_Dies);
+	Mix_FreeChunk(SFX_Cherry);
+	Mix_FreeChunk(SFX_EatingGhost);
+	Mix_FreeChunk(SFX_ExtraLife);
 
-	Effect1 = NULL;
-	Effect2 = NULL;
-	Effect3 = NULL;
-	Effect4 = NULL;
+	SFX_OpeningSong = NULL;
+	SFX_WakaWaka = NULL;
+	SFX_Dies = NULL;
+	SFX_Cherry = NULL;
+	SFX_EatingGhost = NULL;
+	SFX_ExtraLife = NULL;
 
 	//Free the music
 	Mix_FreeMusic(gMusic);
@@ -211,14 +217,14 @@ int main( int argc, char* args[] )
 
 	//Initialize SDL_mixer http://lazyfoo.net/tutorials/SDL/21_sound_effects_and_music/index.php
 	//Sound Frequency, Sample format, Hardware channels
-	if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0)
+	if (Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 2048) < 0)
 	{
 		std::cout <<"SDL_mixer could not initialize! SDL_mixer Error: %s\n" << Mix_GetError() << std::endl;
 		cleanExit(1);
 	}
 
 	//Load music http://open.commonly.cc/
-    std::string MusicPath = "./assets/Sound/Music.mp3";
+    std::string MusicPath = "./assets/Sound/Pacman Siren Clean Loop.mp3";
 	gMusic = Mix_LoadMUS(MusicPath.c_str());
 	if (gMusic == NULL)
 	{
@@ -226,7 +232,14 @@ int main( int argc, char* args[] )
 		cleanExit(1);
 	}
 
-	//Load in effects
+	//Load sound effects
+	std::string OpeningSong = "./assets/Sound/Pacman Opening Song.mp3";
+	SFX_OpeningSong = Mix_LoadWAV(OpeningSong.c_str());
+	if(SFX_OpeningSong == NULL )
+	{
+		printf("Failed to load music! SDL_mixer Error: %s\n", Mix_GetError());
+		cleanExit(1);
+	}
 	//Then make a music Class
 
 
