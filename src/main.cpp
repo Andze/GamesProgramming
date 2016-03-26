@@ -1,6 +1,8 @@
 
 #include "common.h"
 #include "Sprite.h"
+#include "Text.h"
+
 
 #ifdef _WIN32 // compiling on windows
 #include <SDL.h>
@@ -21,19 +23,22 @@ SDL_Renderer *ren; //pointer to the SDL_Renderer
 SDL_Surface *surface; //pointer to the SDL_Surface
 SDL_Texture *tex; //pointer to the SDL_Texture
 SDL_Surface *messageSurface; //pointer to the SDL_Surface for message
+SDL_Texture *messageTexture; //pointer to the SDL_Texture for message
+SDL_Rect message_rect; //SDL_rect for the message
+
 SDL_Surface *HighScore; //pointer to the SDL_Surface for message
 SDL_Surface *Score; //pointer to the SDL_Surface for message
-SDL_Texture *messageTexture; //pointer to the SDL_Texture for message
-SDL_Texture *messageTexture1; //pointer to the SDL_Texture for message
-SDL_Texture *messageTexture2; //pointer to the SDL_Texture for message
-SDL_Rect message_rect; //SDL_rect for the message
 SDL_Rect HighScore_rect; //SDL_rect for the message
 SDL_Rect Score_rect; //SDL_rect for the message
+SDL_Texture *messageTexture1; //pointer to the SDL_Texture for message
+SDL_Texture *messageTexture2; //pointer to the SDL_Texture for message
 
 bool done = false;
 
 //std::vector<unique_ptr<Sprite>> spriteList;
 std::map<string, unique_ptr<Sprite>> spriteList;
+
+std::map<string, unique_ptr<Text>> textList;
 
 //The music that will be played
 Mix_Music *gMusic = NULL;
@@ -153,6 +158,14 @@ void render()
 			SDL_RenderCopy(ren, tex, NULL, &spriteKv.second->rectangle);
 		}
 
+		//Draw Text in Text list
+		for (auto const& textKv : textList) //unique_ptr can't be copied, so use reference
+		{
+			//sprite &thisSprite = spriteKv.second
+			SDL_RenderCopy(ren, tex, NULL, &textKv.second->rectangle);
+		}
+
+
 		//Draw the text
 		SDL_RenderCopy(ren, messageTexture, NULL, &message_rect);
 		SDL_RenderCopy(ren, messageTexture1, NULL, &HighScore_rect);
@@ -225,8 +238,30 @@ void LoadText()
 	HighScore_rect.y = 45;
 	HighScore_rect.w = 60;
 	HighScore_rect.h = 20;
-
 }
+
+void LoadSprites()
+{
+	//Add Sprites to SpriteList
+	SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO, "Adding sprites...");
+	//Adding Sprites to list with uniquie pointer and X,Y,W,H
+	//spriteList.insert(std::unique_ptr<Sprite>(new Sprite(0, 0, 200, 86)));
+	//spriteList.insert(std::unique_ptr<Sprite>(new Sprite(200, 200, 200, 86)));
+	spriteList.emplace("Sprite1", std::unique_ptr<Sprite>(new Sprite(0, 0, 200, 86)));
+	spriteList.emplace("Sprite2", std::unique_ptr<Sprite>(new Sprite(200, 200, 200, 86)));
+
+	SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO, "Sprites added");
+
+	//Add Text to textList
+	SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO, "Adding Text...");
+
+	//Adding Sprites to list with uniquie pointer and X,Y,W,H
+	textList.emplace("Text1", std::unique_ptr<Text>(new Text("Test", 0, 0, 200, 86)));
+	textList.emplace("Text2", std::unique_ptr<Text>(new Text("Test", 200, 200, 200, 86)));
+
+	SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO, "Text added");
+}
+
 void LoadSound()
 {
 	//Initialize SDL_mixer http://lazyfoo.net/tutorials/SDL/21_sound_effects_and_music/index.php
@@ -337,24 +372,14 @@ int main( int argc, char* args[] )
 	
 
 
-	//Add Sprites to SpriteList
-	SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO, "Adding sprites...");
-	//Adding Sprites to list with uniquie pointer and X,Y,W,H
-	//spriteList.insert(std::unique_ptr<Sprite>(new Sprite(0, 0, 200, 86)));
-	//spriteList.insert(std::unique_ptr<Sprite>(new Sprite(200, 200, 200, 86)));
-	spriteList.emplace("Sprite1", std::unique_ptr<Sprite>(new Sprite(0, 0, 200, 86)));
-	spriteList.emplace("Sprite2", std::unique_ptr<Sprite>(new Sprite(200, 200, 200, 86)));
-
-	SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO, "Sprites added");
-
-	
-
 	//			Timer
 	//auto t1 = Clock::now();
 	//auto t2 = Clock::now();
 	/*std::cout << "Delta t2-t1: "
 		<< std::chrono::duration_cast<std::chrono::nanoseconds>(t2 - t1).count()
 		<< " nanoseconds" << std::endl;*/
+
+	LoadSprites();
 
 	LoadText();
 
