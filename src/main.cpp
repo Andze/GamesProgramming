@@ -93,7 +93,7 @@ void handleInput()
 
 						//Play scratch sound effect
 					case SDLK_4:
-						Mix_PlayChannel(-1, SFX_Cherry, 0);
+						Mix_PlayChannel(-1, SFX_EatingGhost, 0);
 						break;
 
 					case SDLK_9:
@@ -240,10 +240,33 @@ int main( int argc, char* args[] )
 		printf("Failed to load music! SDL_mixer Error: %s\n", Mix_GetError());
 		cleanExit(1);
 	}
+	//Load sound effects
+	std::string WakaWaka = "./assets/Sound/PacmanWakaWaka1.Wav";
+	SFX_WakaWaka = Mix_LoadWAV(WakaWaka.c_str());
+	if (SFX_WakaWaka == NULL)
+	{
+		printf("Failed to load music! SDL_mixer Error: %s\n", Mix_GetError());
+		cleanExit(1);
+	}
+
+	//Load sound effects
+	std::string EatingGhost = "./assets/Sound/Pacman Eating Ghost.Wav";
+	SFX_EatingGhost = Mix_LoadWAV(EatingGhost.c_str());
+	if (SFX_EatingGhost == NULL)
+	{
+		printf("Failed to load music! SDL_mixer Error: %s\n", Mix_GetError());
+		cleanExit(1);
+	}
+
+	//Load sound effects
+	std::string Dies = "./assets/Sound/Pacman Dies.Wav";
+	SFX_Dies = Mix_LoadWAV(Dies.c_str());
+	if (SFX_Dies == NULL)
+	{
+		printf("Failed to load music! SDL_mixer Error: %s\n", Mix_GetError());
+		cleanExit(1);
+	}
 	//Then make a music Class
-
-
-
 
 
 	if (ren == nullptr)
