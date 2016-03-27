@@ -26,13 +26,6 @@ SDL_Surface *messageSurface; //pointer to the SDL_Surface for message
 SDL_Texture *messageTexture; //pointer to the SDL_Texture for message
 SDL_Rect message_rect; //SDL_rect for the message
 
-SDL_Surface *HighScore; //pointer to the SDL_Surface for message
-SDL_Surface *Score; //pointer to the SDL_Surface for message
-SDL_Rect HighScore_rect; //SDL_rect for the message
-SDL_Rect Score_rect; //SDL_rect for the message
-SDL_Texture *messageTexture1; //pointer to the SDL_Texture for message
-SDL_Texture *messageTexture2; //pointer to the SDL_Texture for message
-
 bool done = false;
 
 //std::vector<unique_ptr<Sprite>> spriteList;
@@ -149,7 +142,8 @@ void render()
 		SDL_RenderClear(ren);
 
 		//Draw the texture
-		SDL_RenderCopy(ren, tex, NULL, NULL);
+		//SDL_RenderCopy(ren, tex, NULL, NULL);
+		
 
 		//Draw Sprites in sprite list
 		for (auto const& spriteKv : spriteList) //unique_ptr can't be copied, so use reference
@@ -162,13 +156,13 @@ void render()
 		for (auto const& textKv : textList) //unique_ptr can't be copied, so use reference
 		{
 			//sprite &thisSprite = spriteKv.second
-			SDL_RenderCopy(ren, tex, NULL, &textKv.second->rectangle);
+			SDL_RenderCopy(ren, messageTexture, NULL, &textKv.second->rectangle);
 		}
 
 
 		//Draw the text
-		SDL_RenderCopy(ren, messageTexture, NULL, &message_rect);
-		SDL_RenderCopy(ren, messageTexture1, NULL, &HighScore_rect);
+		//SDL_RenderCopy(ren, messageTexture, NULL, &message_rect);
+		//SDL_RenderCopy(ren, messageTexture1, NULL, &HighScore_rect);
 
 		//Update the screen
 		SDL_RenderPresent(ren);
@@ -177,8 +171,6 @@ void render()
 void cleanExit(int returnValue)
 {
 	if (messageTexture != nullptr) SDL_DestroyTexture(messageTexture);
-	if (messageTexture1 != nullptr) SDL_DestroyTexture(messageTexture1);
-	if (messageTexture2 != nullptr) SDL_DestroyTexture(messageTexture2);
 	if (tex != nullptr) SDL_DestroyTexture(tex);
 	if (ren != nullptr) SDL_DestroyRenderer(ren);
 	if (win != nullptr) SDL_DestroyWindow(win);
@@ -216,6 +208,7 @@ void LoadText()
 		cleanExit(1);
 	}
 
+	//Load hacktype face
 	TTF_Font* sans = TTF_OpenFont("./assets/Fonts/Hack-Regular.ttf", 96);
 	if (sans == nullptr)
 	{
@@ -225,23 +218,49 @@ void LoadText()
 
 	//display text
 	SDL_Color White = { 255, 255, 255 };
+
 	messageSurface = TTF_RenderText_Solid(sans, "High Score", White);
 	messageTexture = SDL_CreateTextureFromSurface(ren, messageSurface);
-	message_rect.x = 325;
+
+	/*message_rect.x = 325;
 	message_rect.y = 0;
 	message_rect.w = 150;
 	message_rect.h = 40;
-
-	HighScore = TTF_RenderText_Solid(sans, "000", White);
+*/
+	/*HighScore = TTF_RenderText_Solid(sans, "000", White);
 	messageTexture1 = SDL_CreateTextureFromSurface(ren, HighScore);
 	HighScore_rect.x = 370;
 	HighScore_rect.y = 45;
 	HighScore_rect.w = 60;
-	HighScore_rect.h = 20;
+	HighScore_rect.h = 20;*/
+
+	//Add Text to textList
+	SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO, "Adding Text...");
+
+	//Adding Sprites to list with uniquie pointer and X,Y,W,H
+	textList.emplace("Text1", std::unique_ptr<Text>(new Text(325, 0, 150, 40)));
+	textList.emplace("Text2", std::unique_ptr<Text>(new Text(370, 45, 60, 20)));
+
+	SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO, "Text added");
 }
 
 void LoadSprites()
 {
+	//Load Img
+	std::string imagePath = "./assets/Imgs/Opengl-logo.svg.png";
+	surface = IMG_Load(imagePath.c_str());
+	if (surface == nullptr) {
+		std::cout << "SDL IMG_Load Error: " << SDL_GetError() << std::endl;
+		cleanExit(1);
+	}
+
+	tex = SDL_CreateTextureFromSurface(ren, surface);
+	SDL_FreeSurface(surface);
+	if (tex == nullptr) {
+		std::cout << "SDL_CreateTextureFromSurface Error: " << SDL_GetError() << std::endl;
+		cleanExit(1);
+	}
+
 	//Add Sprites to SpriteList
 	SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO, "Adding sprites...");
 	//Adding Sprites to list with uniquie pointer and X,Y,W,H
@@ -251,15 +270,6 @@ void LoadSprites()
 	spriteList.emplace("Sprite2", std::unique_ptr<Sprite>(new Sprite(200, 200, 200, 86)));
 
 	SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO, "Sprites added");
-
-	//Add Text to textList
-	SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO, "Adding Text...");
-
-	//Adding Sprites to list with uniquie pointer and X,Y,W,H
-	textList.emplace("Text1", std::unique_ptr<Text>(new Text("Test", 0, 0, 200, 86)));
-	textList.emplace("Text2", std::unique_ptr<Text>(new Text("Test", 200, 200, 200, 86)));
-
-	SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO, "Text added");
 }
 
 void LoadSound()
@@ -353,24 +363,7 @@ int main( int argc, char* args[] )
 		std::cout << "SDL_CreateRenderer Error: " << SDL_GetError() << std::endl;
 		cleanExit(1);
 	}
-
-	//Load Img
-	std::string imagePath = "./assets/Imgs/Opengl-logo.svg.png";
-	surface = IMG_Load(imagePath.c_str());
-	if (surface == nullptr){
-		std::cout << "SDL IMG_Load Error: " << SDL_GetError() << std::endl;
-		cleanExit(1);
-	}
-
-	tex = SDL_CreateTextureFromSurface(ren, surface);
-	SDL_FreeSurface(surface);
-	if (tex == nullptr){
-		std::cout << "SDL_CreateTextureFromSurface Error: " << SDL_GetError() << std::endl;
-		cleanExit(1);
-	}
-
 	
-
 
 	//			Timer
 	//auto t1 = Clock::now();

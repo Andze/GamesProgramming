@@ -4,7 +4,7 @@
 
 #include "common.h"
 
-#endif /* end of include guard: */
+
 
 class Sprite
 {
@@ -14,4 +14,6 @@ public:
 	Sprite(const Sprite& sprite);
 	~Sprite();
 };
+
+#endif /* end of include guard: */
 

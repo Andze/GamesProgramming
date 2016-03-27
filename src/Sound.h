@@ -4,7 +4,7 @@
 
 #include "common.h"
 
-#endif /* end of include guard: */
+
 class Sound
 {
 public:
@@ -12,3 +12,4 @@ public:
 	~Sound();
 };
 
+#endif /* end of include guard: */

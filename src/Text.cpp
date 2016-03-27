@@ -1,6 +1,6 @@
 #include "Text.h"
 
-Text::Text(char a, int x, int y, int w, int h)
+Text::Text(int x, int y, int w, int h)
 {
 	SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO, "Text Constructed(%p)", this);
 	rectangle.x = x;

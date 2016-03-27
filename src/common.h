@@ -11,3 +11,6 @@ typedef std::chrono::high_resolution_clock Clock;
 #include <SDL_mixer.h>
 #include <SDL_net.h>
 #include <stdio.h>
+#include <SDL_image.h>
+#include <SDL_ttf.h>
+
