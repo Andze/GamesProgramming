@@ -4,8 +4,6 @@
 
 #include "common.h"
 
-
-
 class Sprite
 {
 public:

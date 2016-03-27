@@ -19,18 +19,29 @@ using namespace std;
 
 std::string exeName;
 SDL_Window *win; //pointer to the SDL_Window
+
 SDL_Renderer *ren; //pointer to the SDL_Renderer
 SDL_Surface *surface; //pointer to the SDL_Surface
 SDL_Texture *tex; //pointer to the SDL_Texture
+
 SDL_Surface *messageSurface; //pointer to the SDL_Surface for message
 SDL_Texture *messageTexture; //pointer to the SDL_Texture for message
 SDL_Rect message_rect; //SDL_rect for the message
 
+//Score
+SDL_Rect Score_rect; //SDL_rect for the Score
+SDL_Surface *ScoreSurface;
+SDL_Texture *ScoreTexture;
+SDL_Rect HScore_rect; //SDL_rect for the Score
+SDL_Surface *HScoreSurface;
+SDL_Texture *HScoreTexture;
+
+int PlayerScore = 0;
+int HighScore = 0;
 bool done = false;
 
 //std::vector<unique_ptr<Sprite>> spriteList;
 std::map<string, unique_ptr<Sprite>> spriteList;
-
 std::map<string, unique_ptr<Text>> textList;
 
 //The music that will be played
@@ -43,6 +54,8 @@ Mix_Chunk *SFX_Dies = NULL;
 Mix_Chunk *SFX_Cherry = NULL;
 Mix_Chunk *SFX_EatingGhost = NULL;
 Mix_Chunk *SFX_ExtraLife = NULL;
+
+
 
 void handleInput()
 {
@@ -83,6 +96,7 @@ void handleInput()
 						//Play high sound effect
 					case SDLK_1:
 						Mix_PlayChannel(-1, SFX_OpeningSong, 0);
+						HighScore += 10;
 						break;
 
 						//Play medium sound effect
@@ -155,14 +169,16 @@ void render()
 		//Draw Text in Text list
 		for (auto const& textKv : textList) //unique_ptr can't be copied, so use reference
 		{
-			//sprite &thisSprite = spriteKv.second
+			// Rendering text from the text list
 			SDL_RenderCopy(ren, messageTexture, NULL, &textKv.second->rectangle);
 		}
 
-
 		//Draw the text
 		//SDL_RenderCopy(ren, messageTexture, NULL, &message_rect);
-		//SDL_RenderCopy(ren, messageTexture1, NULL, &HighScore_rect);
+
+		//Draw the Score and High Score
+		SDL_RenderCopy(ren, ScoreTexture, NULL, &Score_rect);
+		SDL_RenderCopy(ren, HScoreTexture, NULL, &HScore_rect);
 
 		//Update the screen
 		SDL_RenderPresent(ren);
@@ -199,6 +215,44 @@ void cleanExit(int returnValue)
 	exit(returnValue);
 }
 
+void Score()
+{
+	//Load Font
+	if (TTF_Init() == -1)
+	{
+		std::cout << "TTF_Init Failed: " << TTF_GetError() << std::endl;
+		cleanExit(1);
+	}
+
+	//Load hacktype face
+	TTF_Font* sans = TTF_OpenFont("./assets/Fonts/Hack-Regular.ttf", 96);
+	if (sans == nullptr)
+	{
+		std::cout << "TTF_OpenFont Error: " << TTF_GetError() << std::endl;
+		cleanExit(1);
+	}
+
+	//Defining colour to be used
+	SDL_Color White = { 255, 255, 255 };
+
+	//Score
+	stringstream Pscore, Hscore;
+	Pscore << PlayerScore;
+	Hscore << HighScore;
+
+	//Setting Score Int to Score Texture to be used by render to draw
+	ScoreSurface = TTF_RenderText_Solid(sans, Pscore.str().c_str(), White);
+	ScoreTexture = SDL_CreateTextureFromSurface(ren, ScoreSurface);
+	//Rect for where the Score is to be drawn
+	Score_rect.x = 200;	Score_rect.y = 45;	Score_rect.w = 60;	Score_rect.h = 20;
+
+	//Setting Score Int to Score Texture to be used by render to draw
+	HScoreSurface = TTF_RenderText_Solid(sans, Hscore.str().c_str(), White);
+	HScoreTexture = SDL_CreateTextureFromSurface(ren, HScoreSurface);
+	//Rect for where the Score is to be drawn
+	HScore_rect.x = 370;	HScore_rect.y = 45;	HScore_rect.w = 60;	HScore_rect.h = 20;
+
+}
 void LoadText()
 {
 	//Load Font
@@ -216,23 +270,20 @@ void LoadText()
 		cleanExit(1);
 	}
 
-	//display text
+	//Defining colour to be used
 	SDL_Color White = { 255, 255, 255 };
 
-	messageSurface = TTF_RenderText_Solid(sans, "High Score", White);
+	//Score
+	int PlayerScore = 0;
+	int HighScore = 0;
+	stringstream Pscore, Hscore;
+	Pscore << PlayerScore;
+	Hscore << HighScore;
+
+	char *text = "High Score";
+	messageSurface = TTF_RenderText_Solid(sans, text, White);
 	messageTexture = SDL_CreateTextureFromSurface(ren, messageSurface);
 
-	/*message_rect.x = 325;
-	message_rect.y = 0;
-	message_rect.w = 150;
-	message_rect.h = 40;
-*/
-	/*HighScore = TTF_RenderText_Solid(sans, "000", White);
-	messageTexture1 = SDL_CreateTextureFromSurface(ren, HighScore);
-	HighScore_rect.x = 370;
-	HighScore_rect.y = 45;
-	HighScore_rect.w = 60;
-	HighScore_rect.h = 20;*/
 
 	//Add Text to textList
 	SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO, "Adding Text...");
@@ -381,6 +432,8 @@ int main( int argc, char* args[] )
 	while (!done) //loop until done flag is set)
 
 	{	
+		Score();
+
 		handleInput(); // this should ONLY SET VARIABLES
 
 		updateSimulation(); // this should ONLY SET VARIABLES according to simulation
