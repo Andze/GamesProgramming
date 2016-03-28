@@ -32,6 +32,7 @@ SDL_Rect message_rect; //SDL_rect for the message
 SDL_Rect Score_rect; //SDL_rect for the Score
 SDL_Surface *ScoreSurface;
 SDL_Texture *ScoreTexture;
+//High Score
 SDL_Rect HScore_rect; //SDL_rect for the Score
 SDL_Surface *HScoreSurface;
 SDL_Texture *HScoreTexture;
@@ -269,21 +270,12 @@ void LoadText()
 		std::cout << "TTF_OpenFont Error: " << TTF_GetError() << std::endl;
 		cleanExit(1);
 	}
-
 	//Defining colour to be used
 	SDL_Color White = { 255, 255, 255 };
-
-	//Score
-	int PlayerScore = 0;
-	int HighScore = 0;
-	stringstream Pscore, Hscore;
-	Pscore << PlayerScore;
-	Hscore << HighScore;
 
 	char *text = "High Score";
 	messageSurface = TTF_RenderText_Solid(sans, text, White);
 	messageTexture = SDL_CreateTextureFromSurface(ren, messageSurface);
-
 
 	//Add Text to textList
 	SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO, "Adding Text...");
@@ -378,9 +370,7 @@ void LoadSound()
 	}
 	
 }
-
-// based on http://www.willusher.io/sdl2%20tutorials/2013/08/17/lesson-1-hello-world/
-int main( int argc, char* args[] )
+void init()
 {
 	if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
 	{
@@ -399,21 +389,22 @@ int main( int argc, char* args[] )
 		cleanExit(1);
 	}
 	std::cout << "SDL CreatedWindow OK!\n";
-	
 
 	//turning V Sync On 
 	ren = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 
 	//Turning V Sync off
 	//ren = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED );
-	
-	
 
 	if (ren == nullptr)
 	{
 		std::cout << "SDL_CreateRenderer Error: " << SDL_GetError() << std::endl;
 		cleanExit(1);
 	}
+}
+// based on http://www.willusher.io/sdl2%20tutorials/2013/08/17/lesson-1-hello-world/
+int main( int argc, char* args[] )
+{
 	
 
 	//			Timer
@@ -422,6 +413,7 @@ int main( int argc, char* args[] )
 	/*std::cout << "Delta t2-t1: "
 		<< std::chrono::duration_cast<std::chrono::nanoseconds>(t2 - t1).count()
 		<< " nanoseconds" << std::endl;*/
+	init();
 
 	LoadSprites();
 
