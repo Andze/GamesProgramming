@@ -37,6 +37,11 @@ SDL_Rect HScore_rect; //SDL_rect for the Score
 SDL_Surface *HScoreSurface;
 SDL_Texture *HScoreTexture;
 
+//Background
+SDL_Rect BackgroundLocation_rect;
+SDL_Rect Background_rect;
+SDL_Rect Sprite_rect;
+
 int PlayerScore = 0;
 int HighScore = 0;
 bool done = false;
@@ -177,6 +182,9 @@ void render()
 		//Draw the text
 		//SDL_RenderCopy(ren, messageTexture, NULL, &message_rect);
 
+		//Render Background
+		SDL_RenderCopy(ren, tex, &Background_rect, &BackgroundLocation_rect);
+
 		//Draw the Score and High Score
 		SDL_RenderCopy(ren, ScoreTexture, NULL, &Score_rect);
 		SDL_RenderCopy(ren, HScoreTexture, NULL, &HScore_rect);
@@ -282,7 +290,7 @@ void LoadText()
 
 	//Adding Sprites to list with uniquie pointer and X,Y,W,H
 	textList.emplace("Text1", std::unique_ptr<Text>(new Text(325, 0, 150, 40)));
-	textList.emplace("Text2", std::unique_ptr<Text>(new Text(370, 45, 60, 20)));
+	//textList.emplace("Text2", std::unique_ptr<Text>(new Text(370, 45, 60, 20)));
 
 	SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO, "Text added");
 }
@@ -290,7 +298,7 @@ void LoadText()
 void LoadSprites()
 {
 	//Load Img
-	std::string imagePath = "./assets/Imgs/Opengl-logo.svg.png";
+	std::string imagePath = "./assets/Imgs/Pac-Man.png";
 	surface = IMG_Load(imagePath.c_str());
 	if (surface == nullptr) {
 		std::cout << "SDL IMG_Load Error: " << SDL_GetError() << std::endl;
@@ -304,11 +312,18 @@ void LoadSprites()
 		cleanExit(1);
 	}
 
+	BackgroundLocation_rect.x = 5;
+	BackgroundLocation_rect.y = 75;
+	BackgroundLocation_rect.w = 785;
+	BackgroundLocation_rect.h = 675;
+	Background_rect.x = 226;	
+	Background_rect.y = 0;	
+	Background_rect.w = 226;	
+	Background_rect.h = 248;
+
 	//Add Sprites to SpriteList
 	SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO, "Adding sprites...");
 	//Adding Sprites to list with uniquie pointer and X,Y,W,H
-	//spriteList.insert(std::unique_ptr<Sprite>(new Sprite(0, 0, 200, 86)));
-	//spriteList.insert(std::unique_ptr<Sprite>(new Sprite(200, 200, 200, 86)));
 	spriteList.emplace("Sprite1", std::unique_ptr<Sprite>(new Sprite(0, 0, 200, 86)));
 	spriteList.emplace("Sprite2", std::unique_ptr<Sprite>(new Sprite(200, 200, 200, 86)));
 
