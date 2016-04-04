@@ -178,7 +178,8 @@ void render()
 		for (auto const& spriteKv : spriteList) //unique_ptr can't be copied, so use reference
 		{
 			//sprite &thisSprite = spriteKv.second
-			SDL_RenderCopy(ren, tex, &Sprite_rect, &spriteKv.second->rectangle);
+			SDL_RenderCopy(ren, tex, &spriteKv.second->Lrectangle, &spriteKv.second->rectangle);
+			//SDL_RenderCopy(ren, tex, &Sprite_rect, &spriteKv.second->rectangle);
 		}
 
 		//Draw Text in Text list
@@ -323,9 +324,9 @@ void LoadSprites()
 
 	//Add Sprites to SpriteList
 	SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO, "Adding sprites...");
-	//Adding Sprites to list with uniquie pointer and				 X,  Y,	  W,	H
-	spriteList.emplace("Sprite1", std::unique_ptr<Sprite>(new Sprite(30, 90, 42.5, 42.5)));
-	spriteList.emplace("Sprite2", std::unique_ptr<Sprite>(new Sprite(100, 20, 42.5, 42.5)));
+	//Adding Sprites to list with uniquie pointer and		  Sprite X, Y, W, H	Location X, Y, W, H
+	spriteList.emplace("Sprite1", std::unique_ptr<Sprite>(new Sprite(454,0,15,15,	30,90,42.5,42.5)));
+	spriteList.emplace("Sprite2", std::unique_ptr<Sprite>(new Sprite(454,0,15,15,	30,100,42.5,42.5)));
 
 	SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO, "Sprites added");
 }

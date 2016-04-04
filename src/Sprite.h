@@ -7,8 +7,9 @@
 class Sprite
 {
 public:
+	SDL_Rect Lrectangle;
 	SDL_Rect rectangle;
-	Sprite(int x, int y, int w, int h);
+	Sprite(int xl, int yl, int wl, int hl, int x, int y, int w, int h);
 	Sprite(const Sprite& sprite);
 	~Sprite();
 };
