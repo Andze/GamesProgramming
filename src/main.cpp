@@ -163,21 +163,6 @@ void render()
 
 		//Draw the texture
 		//SDL_RenderCopy(ren, tex, NULL, NULL);
-		
-
-		//Draw Sprites in sprite list
-		for (auto const& spriteKv : spriteList) //unique_ptr can't be copied, so use reference
-		{
-			//sprite &thisSprite = spriteKv.second
-			SDL_RenderCopy(ren, tex, NULL, &spriteKv.second->rectangle);
-		}
-
-		//Draw Text in Text list
-		for (auto const& textKv : textList) //unique_ptr can't be copied, so use reference
-		{
-			// Rendering text from the text list
-			SDL_RenderCopy(ren, messageTexture, NULL, &textKv.second->rectangle);
-		}
 
 		//Draw the text
 		//SDL_RenderCopy(ren, messageTexture, NULL, &message_rect);
@@ -188,6 +173,22 @@ void render()
 		//Draw the Score and High Score
 		SDL_RenderCopy(ren, ScoreTexture, NULL, &Score_rect);
 		SDL_RenderCopy(ren, HScoreTexture, NULL, &HScore_rect);
+
+		//Draw Sprites in sprite list
+		for (auto const& spriteKv : spriteList) //unique_ptr can't be copied, so use reference
+		{
+			//sprite &thisSprite = spriteKv.second
+			SDL_RenderCopy(ren, tex, &Sprite_rect, &spriteKv.second->rectangle);
+		}
+
+		//Draw Text in Text list
+		for (auto const& textKv : textList) //unique_ptr can't be copied, so use reference
+		{
+			// Rendering text from the text list
+			SDL_RenderCopy(ren, messageTexture, NULL, &textKv.second->rectangle);
+		}
+
+		
 
 		//Update the screen
 		SDL_RenderPresent(ren);
@@ -240,11 +241,9 @@ void Score()
 		std::cout << "TTF_OpenFont Error: " << TTF_GetError() << std::endl;
 		cleanExit(1);
 	}
-
 	//Defining colour to be used
 	SDL_Color White = { 255, 255, 255 };
-
-	//Score
+	//Score variables being pasted into string stream
 	stringstream Pscore, Hscore;
 	Pscore << PlayerScore;
 	Hscore << HighScore;
@@ -289,7 +288,7 @@ void LoadText()
 	SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO, "Adding Text...");
 
 	//Adding Sprites to list with uniquie pointer and X,Y,W,H
-	textList.emplace("Text1", std::unique_ptr<Text>(new Text(325, 0, 150, 40)));
+	textList.emplace("Text1", std::unique_ptr<Text>(new Text(275, 0, 150, 40)));
 	//textList.emplace("Text2", std::unique_ptr<Text>(new Text(370, 45, 60, 20)));
 
 	SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO, "Text added");
@@ -312,20 +311,21 @@ void LoadSprites()
 		cleanExit(1);
 	}
 
-	BackgroundLocation_rect.x = 5;
-	BackgroundLocation_rect.y = 75;
-	BackgroundLocation_rect.w = 785;
-	BackgroundLocation_rect.h = 675;
-	Background_rect.x = 226;	
-	Background_rect.y = 0;	
-	Background_rect.w = 226;	
-	Background_rect.h = 248;
+	BackgroundLocation_rect.x = 5;BackgroundLocation_rect.y = 75;BackgroundLocation_rect.w = 685;BackgroundLocation_rect.h = 752;
+
+	Background_rect.x = 226;Background_rect.y = 0;Background_rect.w = 226;Background_rect.h = 248;
+
+	//each small pacman is 15
+	Sprite_rect.x = 454;
+	Sprite_rect.y = 0;
+	Sprite_rect.w = 15;
+	Sprite_rect.h = 15;
 
 	//Add Sprites to SpriteList
 	SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO, "Adding sprites...");
-	//Adding Sprites to list with uniquie pointer and X,Y,W,H
-	spriteList.emplace("Sprite1", std::unique_ptr<Sprite>(new Sprite(0, 0, 200, 86)));
-	spriteList.emplace("Sprite2", std::unique_ptr<Sprite>(new Sprite(200, 200, 200, 86)));
+	//Adding Sprites to list with uniquie pointer and				 X,  Y,	  W,	H
+	spriteList.emplace("Sprite1", std::unique_ptr<Sprite>(new Sprite(30, 90, 42.5, 42.5)));
+	spriteList.emplace("Sprite2", std::unique_ptr<Sprite>(new Sprite(100, 20, 42.5, 42.5)));
 
 	SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO, "Sprites added");
 }
@@ -395,7 +395,7 @@ void init()
 	std::cout << "SDL initialised OK!\n";
 
 	//create window
-	win = SDL_CreateWindow("Pacman", 100, 100, 800, 800, SDL_WINDOW_SHOWN);
+	win = SDL_CreateWindow("Pacman", 100, 100, 700, 875, SDL_WINDOW_SHOWN);
 
 	//error handling
 	if (win == nullptr)
