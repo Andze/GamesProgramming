@@ -215,6 +215,16 @@ void render()
 		
 		//Update the screen
 		SDL_RenderPresent(ren);
+
+		//Destruct textures
+		SDL_DestroyTexture(messageTexture);
+		SDL_DestroyTexture(tex);
+		SDL_DestroyRenderer(ren);
+
+		SDL_FreeSurface(HScoreSurface);
+		SDL_FreeSurface(ScoreSurface);
+		SDL_DestroyTexture(ScoreTexture);
+		SDL_DestroyTexture(HScoreTexture);
 }
 
 void cleanExit(int returnValue)
@@ -250,6 +260,7 @@ void cleanExit(int returnValue)
 
 void Score()
 {
+	//Loading in the font in the update loop is a bad idea you twat MEMORY LEAK
 	//Load Font
 	if (TTF_Init() == -1)
 	{
@@ -275,13 +286,21 @@ void Score()
 	ScoreSurface = TTF_RenderText_Solid(sans, Pscore.str().c_str(), White);
 	ScoreTexture = SDL_CreateTextureFromSurface(ren, ScoreSurface);
 	//Rect for where the Score is to be drawn
-	Score_rect.x = 200;	Score_rect.y = 45;	Score_rect.w = 60;	Score_rect.h = 20;
+	Score_rect.x = 200;	
+	Score_rect.y = 45;	
+	Score_rect.w = 60;	
+	Score_rect.h = 20;
 
 	//Setting Score Int to Score Texture to be used by render to draw
 	HScoreSurface = TTF_RenderText_Solid(sans, Hscore.str().c_str(), White);
 	HScoreTexture = SDL_CreateTextureFromSurface(ren, HScoreSurface);
 	//Rect for where the Score is to be drawn
-	HScore_rect.x = 370;	HScore_rect.y = 45;	HScore_rect.w = 60;	HScore_rect.h = 20;
+	HScore_rect.x = 370;	
+	HScore_rect.y = 45;	
+	HScore_rect.w = 60;
+	HScore_rect.h = 20;
+
+	
 
 }
 void LoadText()
