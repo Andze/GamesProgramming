@@ -38,13 +38,12 @@ SDL_Surface *HScoreSurface;
 SDL_Texture *HScoreTexture;
 
 //Background
-SDL_Rect BackgroundLocation_rect;
-SDL_Rect Background_rect;
 SDL_Rect Sprite_rect;
 
 int PlayerScore = 0;
 int HighScore = 0;
 bool done = false;
+int *CurrentSprite = NULL;
 
 //std::vector<unique_ptr<Sprite>> spriteList;
 std::map<string, unique_ptr<Sprite>> spriteList;
@@ -61,7 +60,7 @@ Mix_Chunk *SFX_Cherry = NULL;
 Mix_Chunk *SFX_EatingGhost = NULL;
 Mix_Chunk *SFX_ExtraLife = NULL;
 
-
+bool W, A, S, D, UP, DOWN, LEFT, RIGHT = false;
 
 void handleInput()
 {
@@ -99,7 +98,19 @@ void handleInput()
 					//hit escape to exit
 					case SDLK_ESCAPE: done = true;
 
-						//Play high sound effect
+					case SDLK_UP:
+						UP = true;
+						break;
+					case SDLK_DOWN:
+						DOWN = true;
+						break;
+					case SDLK_RIGHT:
+						RIGHT = true;
+						break;
+					case SDLK_LEFT:
+						LEFT = true;
+						break;
+
 					case SDLK_1:
 						Mix_PlayChannel(-1, SFX_OpeningSong, 0);
 						HighScore += 10;
@@ -154,6 +165,22 @@ void handleInput()
 void updateSimulation(double simLength = 0.02) //update simulation with an amount of time to simulate for (in seconds)
 {
   //CHANGE ME
+	if (UP == true)
+	{
+		
+	}
+	if (DOWN == true)
+	{
+
+	}
+	if (RIGHT == true)
+	{
+
+	}
+	if (LEFT == true)
+	{
+
+	}
 }
 
 void render()
@@ -167,9 +194,6 @@ void render()
 		//Draw the text
 		//SDL_RenderCopy(ren, messageTexture, NULL, &message_rect);
 
-		//Render Background
-		SDL_RenderCopy(ren, tex, &Background_rect, &BackgroundLocation_rect);
-
 		//Draw the Score and High Score
 		SDL_RenderCopy(ren, ScoreTexture, NULL, &Score_rect);
 		SDL_RenderCopy(ren, HScoreTexture, NULL, &HScore_rect);
@@ -179,7 +203,6 @@ void render()
 		{
 			//sprite &thisSprite = spriteKv.second
 			SDL_RenderCopy(ren, tex, &spriteKv.second->Lrectangle, &spriteKv.second->rectangle);
-			//SDL_RenderCopy(ren, tex, &Sprite_rect, &spriteKv.second->rectangle);
 		}
 
 		//Draw Text in Text list
@@ -190,7 +213,6 @@ void render()
 		}
 
 		
-
 		//Update the screen
 		SDL_RenderPresent(ren);
 }
@@ -312,21 +334,23 @@ void LoadSprites()
 		cleanExit(1);
 	}
 
-	BackgroundLocation_rect.x = 5;BackgroundLocation_rect.y = 75;BackgroundLocation_rect.w = 685;BackgroundLocation_rect.h = 752;
-
-	Background_rect.x = 226;Background_rect.y = 0;Background_rect.w = 226;Background_rect.h = 248;
-
 	//each small pacman is 15
 	Sprite_rect.x = 454;
 	Sprite_rect.y = 0;
 	Sprite_rect.w = 15;
 	Sprite_rect.h = 15;
 
+	int test = 455;
+	CurrentSprite = &test;
+
 	//Add Sprites to SpriteList
 	SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO, "Adding sprites...");
 	//Adding Sprites to list with uniquie pointer and		  Sprite X, Y, W, H	Location X, Y, W, H
-	spriteList.emplace("Sprite1", std::unique_ptr<Sprite>(new Sprite(454,0,15,15,	30,90,42.5,42.5)));
-	spriteList.emplace("Sprite2", std::unique_ptr<Sprite>(new Sprite(454,0,15,15,	30,100,42.5,42.5)));
+	spriteList.emplace("Background", std::unique_ptr<Sprite>(new Sprite(226, 0, 226, 248, 5, 75, 685, 752)));
+	spriteList.emplace("Pacman_Whole", std::unique_ptr<Sprite>(new Sprite(*CurrentSprite,0,15,15,		30,90,42.5,42.5)));
+	spriteList.emplace("Pacman_Right_1", std::unique_ptr<Sprite>(new Sprite(472,0,15,15,	80,90,42.5,42.5)));
+	spriteList.emplace("Pacman_Right_2", std::unique_ptr<Sprite>(new Sprite(488,0,15,15,	120,90,42.5,42.5)));
+	
 
 	SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO, "Sprites added");
 }
