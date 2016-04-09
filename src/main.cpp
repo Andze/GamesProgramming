@@ -42,6 +42,7 @@ SDL_Rect Sprite_rect;
 
 int PlayerScore = 0;
 int HighScore = 0;
+int Temp = 0;
 bool done = false;
 int *CurrentSprite = NULL;
 
@@ -212,7 +213,6 @@ void render()
 			SDL_RenderCopy(ren, messageTexture, NULL, &textKv.second->rectangle);
 		}
 
-		
 		//Update the screen
 		SDL_RenderPresent(ren);
 
@@ -267,7 +267,7 @@ void Score()
 		std::cout << "TTF_Init Failed: " << TTF_GetError() << std::endl;
 		cleanExit(1);
 	}
-
+	
 	//Load hacktype face
 	TTF_Font* sans = TTF_OpenFont("./assets/Fonts/Hack-Regular.ttf", 96);
 	if (sans == nullptr)
@@ -275,6 +275,7 @@ void Score()
 		std::cout << "TTF_OpenFont Error: " << TTF_GetError() << std::endl;
 		cleanExit(1);
 	}
+
 	//Defining colour to be used
 	SDL_Color White = { 255, 255, 255 };
 	//Score variables being pasted into string stream
