@@ -37,14 +37,21 @@ SDL_Rect HScore_rect; //SDL_rect for the Score
 SDL_Surface *HScoreSurface;
 SDL_Texture *HScoreTexture;
 
-//Background
-SDL_Rect Sprite_rect;
+//Sprite
+const int Right = 3;
+SDL_Rect Sprite_rect[ Right ];
+Uint32 sprite;
 
 int PlayerScore = 0;
 int HighScore = 0;
 int Temp = 0;
 bool done = false;
 int *CurrentSprite = NULL;
+
+//Event handler 
+SDL_Event e; 
+//Current animation frame 
+int frame = 0;
 
 //std::vector<unique_ptr<Sprite>> spriteList;
 std::map<string, unique_ptr<Sprite>> spriteList;
@@ -110,7 +117,6 @@ void handleInput()
 						break;
 					case SDLK_LEFT:
 						LEFT = true;
-						Sprite_rect.x += 15;
 						break;
 
 					case SDLK_1:
@@ -182,12 +188,14 @@ void updateSimulation(double simLength = 0.02) //update simulation with an amoun
 	if (LEFT == true)
 	{
 		
-		
 	}
 }
 
 void render()
 {
+		Uint32 ticks = SDL_GetTicks();
+		Uint32 sprite = (ticks / 1000) % 3;
+
 		//First clear the renderer
 		SDL_RenderClear(ren);
 
@@ -201,11 +209,28 @@ void render()
 		SDL_RenderCopy(ren, ScoreTexture, NULL, &Score_rect);
 		SDL_RenderCopy(ren, HScoreTexture, NULL, &HScore_rect);
 
+		SDL_Rect currentClip; //&Sprite_rect[frame / 4];
+		
+		currentClip.x = 455 + (sprite * 16);
+		currentClip.y = 0;
+		currentClip.w = 15;
+		currentClip.h = 15;
+		
+		
 		//Draw Sprites in sprite list
 		for (auto const& spriteKv : spriteList) //unique_ptr can't be copied, so use reference
 		{
 			//sprite &thisSprite = spriteKv.second
-			SDL_RenderCopy(ren, tex, &spriteKv.second->Lrectangle, &spriteKv.second->rectangle);
+			//SDL_RenderCopy(ren, tex, &spriteKv.second->Lrectangle, &spriteKv.second->rectangle);
+			SDL_RenderCopy(ren, tex, &currentClip, &spriteKv.second->rectangle);
+			
+		}
+	
+		++frame;
+		//Cycle animation 
+		if( frame / 4 >= Right ) 
+		{ 
+			frame = 0; 
 		}
 
 		//Draw Text in Text list
@@ -217,15 +242,7 @@ void render()
 
 		//Update the screen
 		SDL_RenderPresent(ren);
-
-		//Destruct textures
-		SDL_DestroyTexture(messageTexture);
-		SDL_DestroyTexture(tex);
-		SDL_DestroyRenderer(ren);
-		SDL_FreeSurface(HScoreSurface);
-		SDL_FreeSurface(ScoreSurface);
-		SDL_DestroyTexture(ScoreTexture);
-		SDL_DestroyTexture(HScoreTexture);
+		
 }
 
 void cleanExit(int returnValue)
@@ -337,9 +354,9 @@ void LoadText()
 
 	SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO, "Text added");
 }
-//SDL_Color SetColor(int R, int G, int B);
 
 SDL_Color SetColor(int R, int G, int B) {
+
 	SDL_Color Color;
 
 	Color.r = R;
@@ -349,8 +366,8 @@ SDL_Color SetColor(int R, int G, int B) {
 	return Color;
 };
 
-void Transparency(SDL_Surface* Surface, SDL_Color Color) {
-
+void Transparency(SDL_Surface* Surface, SDL_Color Color) 
+{
 	SDL_SetColorKey(Surface, SDL_TRUE, SDL_MapRGB(Surface->format, Color.r, Color.g, Color.b));
 };
 
@@ -372,14 +389,20 @@ void LoadSprites()
 		std::cout << "SDL_CreateTextureFromSurface Error: " << SDL_GetError() << std::endl;
 		cleanExit(1);
 	}
-
 	
-
 	//each small pacman is 15
-	Sprite_rect.x = 454;
-	Sprite_rect.y = 0;
-	Sprite_rect.w = 15;
-	Sprite_rect.h = 15;
+	Sprite_rect[0].x = 455;
+	Sprite_rect[0].y = 0;
+	Sprite_rect[0].w = 15;
+	Sprite_rect[0].h = 15;
+	Sprite_rect[1].x = 472;
+	Sprite_rect[1].y = 0;
+	Sprite_rect[1].w = 15;
+	Sprite_rect[1].h = 15;
+	Sprite_rect[2].x = 488;
+	Sprite_rect[2].y = 0;
+	Sprite_rect[2].w = 15;
+	Sprite_rect[2].h = 15;
 	
 	int test = 455;
 	CurrentSprite = &test;
