@@ -110,6 +110,7 @@ void handleInput()
 						break;
 					case SDLK_LEFT:
 						LEFT = true;
+						Sprite_rect.x += 15;
 						break;
 
 					case SDLK_1:
@@ -180,7 +181,8 @@ void updateSimulation(double simLength = 0.02) //update simulation with an amoun
 	}
 	if (LEFT == true)
 	{
-
+		
+		
 	}
 }
 
@@ -220,7 +222,6 @@ void render()
 		SDL_DestroyTexture(messageTexture);
 		SDL_DestroyTexture(tex);
 		SDL_DestroyRenderer(ren);
-
 		SDL_FreeSurface(HScoreSurface);
 		SDL_FreeSurface(ScoreSurface);
 		SDL_DestroyTexture(ScoreTexture);
@@ -336,6 +337,22 @@ void LoadText()
 
 	SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO, "Text added");
 }
+//SDL_Color SetColor(int R, int G, int B);
+
+SDL_Color SetColor(int R, int G, int B) {
+	SDL_Color Color;
+
+	Color.r = R;
+	Color.g = G;
+	Color.b = B;
+
+	return Color;
+};
+
+void Transparency(SDL_Surface* Surface, SDL_Color Color) {
+
+	SDL_SetColorKey(Surface, SDL_TRUE, SDL_MapRGB(Surface->format, Color.r, Color.g, Color.b));
+};
 
 void LoadSprites()
 {
@@ -347,6 +364,8 @@ void LoadSprites()
 		cleanExit(1);
 	}
 
+	Transparency(surface, SetColor(0, 0, 0));
+
 	tex = SDL_CreateTextureFromSurface(ren, surface);
 	SDL_FreeSurface(surface);
 	if (tex == nullptr) {
@@ -354,12 +373,14 @@ void LoadSprites()
 		cleanExit(1);
 	}
 
+	
+
 	//each small pacman is 15
 	Sprite_rect.x = 454;
 	Sprite_rect.y = 0;
 	Sprite_rect.w = 15;
 	Sprite_rect.h = 15;
-
+	
 	int test = 455;
 	CurrentSprite = &test;
 
@@ -367,7 +388,7 @@ void LoadSprites()
 	SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO, "Adding sprites...");
 	//Adding Sprites to list with uniquie pointer and		  Sprite X, Y, W, H	Location X, Y, W, H
 	spriteList.emplace("Background", std::unique_ptr<Sprite>(new Sprite(226, 0, 226, 248, 5, 75, 685, 752)));
-	spriteList.emplace("Pacman_Whole", std::unique_ptr<Sprite>(new Sprite(*CurrentSprite,0,15,15,		30,90,42.5,42.5)));
+	spriteList.emplace("Pacman_Whole", std::unique_ptr<Sprite>(new Sprite(*CurrentSprite,0,15,15,		60,90,42.5,42.5)));
 	spriteList.emplace("Pacman_Right_1", std::unique_ptr<Sprite>(new Sprite(472,0,15,15,	80,90,42.5,42.5)));
 	spriteList.emplace("Pacman_Right_2", std::unique_ptr<Sprite>(new Sprite(488,0,15,15,	120,90,42.5,42.5)));
 	
