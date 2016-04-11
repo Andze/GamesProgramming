@@ -34,7 +34,7 @@ SDL_Surface *ScoreSurface;
 SDL_Texture *ScoreTexture;
 //High Score
 SDL_Rect HScore_rect; //SDL_rect for the Score
-SDL_Surface *HScoreSurface;
+SDL_Surface *HScoreSurface = nullptr;
 SDL_Texture *HScoreTexture;
 
 //Sprite
@@ -42,10 +42,14 @@ const int Right = 3;
 SDL_Rect Sprite_rect[ Right ];
 Uint32 sprite;
 
+SDL_Color White = { 255, 255, 255 };
+TTF_Font *font = nullptr;
+
 int PlayerScore = 0;
 int HighScore = 0;
 int Temp = 0;
 bool done = false;
+bool loaded = false;
 int *CurrentSprite = NULL;
 
 //Event handler 
@@ -55,6 +59,12 @@ int frame = 0;
 
 //std::vector<unique_ptr<Sprite>> spriteList;
 std::map<string, unique_ptr<Sprite>> spriteList;
+std::map<string, unique_ptr<Sprite>> orangeGhostRight;
+std::map<string, unique_ptr<Sprite>> orangeGhostLeft;
+std::map<string, unique_ptr<Sprite>> orangeGhostUp;
+std::map<string, unique_ptr<Sprite>> orangeGhostDown; //-> class AnimatedSprite or SpriteAnimation
+
+// orangeGhost , which spritelist is active right now -> class renderableThing, has a list of SpriteAnimation, and which is active
 std::map<string, unique_ptr<Text>> textList;
 
 //The music that will be played
@@ -221,8 +231,9 @@ void render()
 		for (auto const& spriteKv : spriteList) //unique_ptr can't be copied, so use reference
 		{
 			//sprite &thisSprite = spriteKv.second
-			//SDL_RenderCopy(ren, tex, &spriteKv.second->Lrectangle, &spriteKv.second->rectangle);
-			SDL_RenderCopy(ren, tex, &currentClip, &spriteKv.second->rectangle);
+			//std::cout << spriteKv.second->Lrectangle.x << std::endl;;
+			SDL_RenderCopy(ren, tex, &spriteKv.second->Lrectangle, &spriteKv.second->rectangle);
+			//SDL_RenderCopy(ren, tex, &currentClip, &spriteKv.second->rectangle);
 			
 		}
 	
@@ -252,6 +263,12 @@ void cleanExit(int returnValue)
 	if (ren != nullptr) SDL_DestroyRenderer(ren);
 	if (win != nullptr) SDL_DestroyWindow(win);
 
+	//Close the font that was used
+	//TTF_CloseFont(font);
+
+	//Quit SDL_ttf
+	TTF_Quit();
+
 	//Free the sound effects
 	Mix_FreeChunk(SFX_OpeningSong);
 	Mix_FreeChunk(SFX_WakaWaka);
@@ -278,62 +295,60 @@ void cleanExit(int returnValue)
 
 void Score()
 {
-	//Loading in the font in the update loop is a bad idea you twat MEMORY LEAK
-	//Load Font
-	if (TTF_Init() == -1)
+	if (loaded == false)
 	{
-		std::cout << "TTF_Init Failed: " << TTF_GetError() << std::endl;
-		cleanExit(1);
+		//Load hacktype face
+		font = TTF_OpenFont("./assets/Fonts/Hack-Regular.ttf", 96);
+		if (font == nullptr)
+		{
+			std::cout << "TTF_OpenFont Error: " << TTF_GetError() << std::endl;
+			cleanExit(1);
+			
+		}
+		loaded = true;
+		std::cout << "FONT LOADED " << std::endl;
 	}
-	
-	//Load hacktype face
-	TTF_Font* sans = TTF_OpenFont("./assets/Fonts/Hack-Regular.ttf", 96);
-	if (sans == nullptr)
-	{
-		std::cout << "TTF_OpenFont Error: " << TTF_GetError() << std::endl;
-		cleanExit(1);
+	if (loaded == true)
+	{	
+		//Score variables being pasted into string stream
+		stringstream Pscore, Hscore;
+		Pscore << PlayerScore;
+		Hscore << HighScore;
+
+		if (ScoreSurface != nullptr) SDL_FreeSurface(ScoreSurface);
+		if (ScoreTexture != nullptr) SDL_DestroyTexture(ScoreTexture);
+
+		//Setting Score Int to Score Texture to be used by render to draw
+		ScoreSurface = TTF_RenderText_Solid(font, Pscore.str().c_str(), White);
+		ScoreTexture = SDL_CreateTextureFromSurface(ren, ScoreSurface);
+		//Rect for where the Score is to be drawn
+		Score_rect.x = 200;	
+		Score_rect.y = 45;	
+		Score_rect.w = 60;	
+		Score_rect.h = 20;
+		
+		if (HScoreSurface != nullptr) SDL_FreeSurface(HScoreSurface);
+		if (HScoreTexture != nullptr) SDL_DestroyTexture(HScoreTexture);
+
+		//Setting Score Int to Score Texture to be used by render to draw
+		// delete old surface and delete of texture (if they are not nullptr)
+		HScoreSurface = TTF_RenderText_Solid(font, Hscore.str().c_str(), White);
+		HScoreTexture = SDL_CreateTextureFromSurface(ren, HScoreSurface);
+		//Rect for where the Score is to be drawn
+		HScore_rect.x = 370;	
+		HScore_rect.y = 45;	
+		HScore_rect.w = 60;
+		HScore_rect.h = 20;
 	}
+}		
 
-	//Defining colour to be used
-	SDL_Color White = { 255, 255, 255 };
-	//Score variables being pasted into string stream
-	stringstream Pscore, Hscore;
-	Pscore << PlayerScore;
-	Hscore << HighScore;
 
-	//Setting Score Int to Score Texture to be used by render to draw
-	ScoreSurface = TTF_RenderText_Solid(sans, Pscore.str().c_str(), White);
-	ScoreTexture = SDL_CreateTextureFromSurface(ren, ScoreSurface);
-	//Rect for where the Score is to be drawn
-	Score_rect.x = 200;	
-	Score_rect.y = 45;	
-	Score_rect.w = 60;	
-	Score_rect.h = 20;
 
-	//Setting Score Int to Score Texture to be used by render to draw
-	HScoreSurface = TTF_RenderText_Solid(sans, Hscore.str().c_str(), White);
-	HScoreTexture = SDL_CreateTextureFromSurface(ren, HScoreSurface);
-	//Rect for where the Score is to be drawn
-	HScore_rect.x = 370;	
-	HScore_rect.y = 45;	
-	HScore_rect.w = 60;
-	HScore_rect.h = 20;
-
-	
-
-}
 void LoadText()
 {
-	//Load Font
-	if (TTF_Init() == -1)
-	{
-		std::cout << "TTF_Init Failed: " << TTF_GetError() << std::endl;
-		cleanExit(1);
-	}
-
 	//Load hacktype face
-	TTF_Font* sans = TTF_OpenFont("./assets/Fonts/Hack-Regular.ttf", 96);
-	if (sans == nullptr)
+	TTF_Font* font = TTF_OpenFont("./assets/Fonts/Hack-Regular.ttf", 96);
+	if (font == nullptr)
 	{
 		std::cout << "TTF_OpenFont Error: " << TTF_GetError() << std::endl;
 		cleanExit(1);
@@ -342,7 +357,7 @@ void LoadText()
 	SDL_Color White = { 255, 255, 255 };
 
 	char *text = "High Score";
-	messageSurface = TTF_RenderText_Solid(sans, text, White);
+	messageSurface = TTF_RenderText_Solid(font, text, White);
 	messageTexture = SDL_CreateTextureFromSurface(ren, messageSurface);
 
 	//Add Text to textList
@@ -494,6 +509,12 @@ void init()
 	}
 	std::cout << "SDL CreatedWindow OK!\n";
 
+	//Initialize SDL_ttf
+	if (TTF_Init() == -1)
+	{
+		cleanExit(1);
+	}
+
 	//turning V Sync On 
 	ren = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 
@@ -517,6 +538,8 @@ int main( int argc, char* args[] )
 	/*std::cout << "Delta t2-t1: "
 		<< std::chrono::duration_cast<std::chrono::nanoseconds>(t2 - t1).count()
 		<< " nanoseconds" << std::endl;*/
+		//Load Font
+
 	init();
 
 	LoadSprites();
