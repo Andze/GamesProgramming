@@ -17,7 +17,7 @@
 
 using namespace std;
 
-std::string exeName;
+std::string Pacman;
 SDL_Window *win; //pointer to the SDL_Window
 
 SDL_Renderer *ren; //pointer to the SDL_Renderer
@@ -51,6 +51,11 @@ int Temp = 0;
 bool done = false;
 bool loaded = false;
 int *CurrentSprite = NULL;
+
+
+SDL_Surface*    Surf_Display;
+SDL_Surface*	testSprite;
+SDL_Surface*    Surf_Test;
 
 //Event handler 
 SDL_Event e; 
@@ -243,15 +248,30 @@ void render()
 		{ 
 			frame = 0; 
 		}
+		
+
+		//spriteList["Pacman_Whole"]->rectangle
+
+		Sprite::Draw(ren, tex, 1, 1, spriteList["Pacman_Whole"]->rectangle.x, spriteList["Pacman_Whole"]->rectangle.y, 50, 50);
+
+		//Sprite::Draw(ren, tex, 300, 300, 0, 0, 50, 50);
+
+		
+		//SDL_Flip(surface);
+
+
 
 		//Draw Text in Text list
 		for (auto const& textKv : textList) //unique_ptr can't be copied, so use reference
 		{
 			// Rendering text from the text list
-			SDL_RenderCopy(ren, messageTexture, NULL, &textKv.second->rectangle);
+			//&textKv.second.draw();
+			Sprite::Draw(ren, messageTexture, &textKv.second->rectangle);
+			//SDL_RenderCopy(ren, messageTexture, NULL, &textKv.second->rectangle);
 		}
 
 		//Update the screen
+	
 		SDL_RenderPresent(ren);
 		
 }
@@ -262,9 +282,6 @@ void cleanExit(int returnValue)
 	if (tex != nullptr) SDL_DestroyTexture(tex);
 	if (ren != nullptr) SDL_DestroyRenderer(ren);
 	if (win != nullptr) SDL_DestroyWindow(win);
-
-	//Close the font that was used
-	//TTF_CloseFont(font);
 
 	//Quit SDL_ttf
 	TTF_Quit();
@@ -388,9 +405,12 @@ void Transparency(SDL_Surface* Surface, SDL_Color Color)
 
 void LoadSprites()
 {
+	testSprite = Sprite::OnLoad("./assets/Imgs/Pac-Man.png");
+
 	//Load Img
 	std::string imagePath = "./assets/Imgs/Pac-Man.png";
 	surface = IMG_Load(imagePath.c_str());
+	testSprite = IMG_Load(imagePath.c_str());
 	if (surface == nullptr) {
 		std::cout << "SDL IMG_Load Error: " << SDL_GetError() << std::endl;
 		cleanExit(1);
@@ -491,6 +511,8 @@ void LoadSound()
 }
 void init()
 {
+	Surf_Display = NULL;
+
 	if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
 	{
 		std::cout << "SDL_Init Error: " << SDL_GetError() << std::endl;
@@ -530,16 +552,6 @@ void init()
 // based on http://www.willusher.io/sdl2%20tutorials/2013/08/17/lesson-1-hello-world/
 int main( int argc, char* args[] )
 {
-	
-
-	//			Timer
-	//auto t1 = Clock::now();
-	//auto t2 = Clock::now();
-	/*std::cout << "Delta t2-t1: "
-		<< std::chrono::duration_cast<std::chrono::nanoseconds>(t2 - t1).count()
-		<< " nanoseconds" << std::endl;*/
-		//Load Font
-
 	init();
 
 	LoadSprites();
