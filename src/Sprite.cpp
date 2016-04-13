@@ -1,4 +1,6 @@
 #include "Sprite.h"
+//http://www.dreamincode.net/forums/topic/112191-beginning-sdl-part-3-a-spritedrawing-class/
+//http://www.sdltutorials.com/sdl-animation
 
 Sprite::Sprite(int xl, int yl, int wl, int hl, int x, int y, int w, int h) {
 	SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO, "Sprite	Constructed(%p)", this);
