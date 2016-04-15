@@ -54,23 +54,15 @@ int *CurrentSprite = NULL;
 
 
 SDL_Surface*    Surf_Display;
-SDL_Surface*	testSprite;
 SDL_Surface*    Surf_Test;
-
-//Event handler 
-SDL_Event e; 
-//Current animation frame 
-int frame = 0;
 
 //std::vector<unique_ptr<Sprite>> spriteList;
 std::map<string, unique_ptr<Sprite>> spriteList;
-std::map<string, unique_ptr<Sprite>> orangeGhostRight;
-std::map<string, unique_ptr<Sprite>> orangeGhostLeft;
-std::map<string, unique_ptr<Sprite>> orangeGhostUp;
-std::map<string, unique_ptr<Sprite>> orangeGhostDown; //-> class AnimatedSprite or SpriteAnimation
+
+//-> class AnimatedSprite or SpriteAnimation
 
 // orangeGhost , which spritelist is active right now -> class renderableThing, has a list of SpriteAnimation, and which is active
-std::map<string, unique_ptr<Text>> textList;
+
 
 //The music that will be played
 Mix_Music *gMusic = NULL;
@@ -223,55 +215,31 @@ void render()
 		//Draw the Score and High Score
 		SDL_RenderCopy(ren, ScoreTexture, NULL, &Score_rect);
 		SDL_RenderCopy(ren, HScoreTexture, NULL, &HScore_rect);
-
-		SDL_Rect currentClip; //&Sprite_rect[frame / 4];
-		
-		currentClip.x = 455 + (sprite * 16);
-		currentClip.y = 0;
-		currentClip.w = 15;
-		currentClip.h = 15;
-		
 		
 		//Draw Sprites in sprite list
 		for (auto const& spriteKv : spriteList) //unique_ptr can't be copied, so use reference
 		{
 			//sprite &thisSprite = spriteKv.second
 			//std::cout << spriteKv.second->Lrectangle.x << std::endl;;
-			SDL_RenderCopy(ren, tex, &spriteKv.second->Lrectangle, &spriteKv.second->rectangle);
+			//SDL_RenderCopy(ren, tex, &spriteKv.second->Lrectangle, &spriteKv.second->rectangle);
 			//SDL_RenderCopy(ren, tex, &currentClip, &spriteKv.second->rectangle);
-			
-		}
-	
-		++frame;
-		//Cycle animation 
-		if( frame / 4 >= Right ) 
-		{ 
-			frame = 0; 
-		}
+			//spriteList["Pacman_Whole"]->rectangle.x
 		
-
+		}
 		//spriteList["Pacman_Whole"]->rectangle
 
-		Sprite::Draw(ren, tex, 1, 1, spriteList["Pacman_Whole"]->rectangle.x, spriteList["Pacman_Whole"]->rectangle.y, 50, 50);
-
-		//Sprite::Draw(ren, tex, 300, 300, 0, 0, 50, 50);
-
+		//Drawing Sprites
+		//			Screen,Img,Source Rectangle, Destination Rectangle
+		//Background
+		Sprite::Draw(ren, tex, 226, 0, 226, 248, 5, 75, 685, 752);
+		//Pacman
+		Sprite::Draw(ren, tex, 455, 0, 15, 15, 60, 90, 42.5, 42.5);
 		
-		//SDL_Flip(surface);
-
-
-
-		//Draw Text in Text list
-		for (auto const& textKv : textList) //unique_ptr can't be copied, so use reference
-		{
-			// Rendering text from the text list
-			//&textKv.second.draw();
-			Sprite::Draw(ren, messageTexture, &textKv.second->rectangle);
-			//SDL_RenderCopy(ren, messageTexture, NULL, &textKv.second->rectangle);
-		}
+		//Drawing Text
+		// DrawText Function, MessageTex, X , Y, W, H,
+		Text::DrawText(ren, messageTexture, 275, 0, 150, 40);
 
 		//Update the screen
-	
 		SDL_RenderPresent(ren);
 		
 }
@@ -360,93 +328,27 @@ void Score()
 }		
 
 
-
 void LoadText()
 {
-	//Load hacktype face
-	TTF_Font* font = TTF_OpenFont("./assets/Fonts/Hack-Regular.ttf", 96);
-	if (font == nullptr)
-	{
-		std::cout << "TTF_OpenFont Error: " << TTF_GetError() << std::endl;
-		cleanExit(1);
-	}
-	//Defining colour to be used
-	SDL_Color White = { 255, 255, 255 };
-
-	char *text = "High Score";
-	messageSurface = TTF_RenderText_Solid(font, text, White);
-	messageTexture = SDL_CreateTextureFromSurface(ren, messageSurface);
-
-	//Add Text to textList
 	SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO, "Adding Text...");
 
-	//Adding Sprites to list with uniquie pointer and X,Y,W,H
-	textList.emplace("Text1", std::unique_ptr<Text>(new Text(275, 0, 150, 40)));
-	//textList.emplace("Text2", std::unique_ptr<Text>(new Text(370, 45, 60, 20)));
+	//Using Text class to load a message to a texture to be drawn
+	//Texture to store message			Font to be used,				Text,		Size,   ColourRGB,	   Render
+	messageTexture = Text::LoadText("./assets/Fonts/Hack-Regular.ttf", "HIGH SCORE" , 96,	255,255,255,	ren);
 
-	SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO, "Text added");
+	SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO, "Text Loaded");
 }
 
-SDL_Color SetColor(int R, int G, int B) {
-
-	SDL_Color Color;
-
-	Color.r = R;
-	Color.g = G;
-	Color.b = B;
-
-	return Color;
-};
-
-void Transparency(SDL_Surface* Surface, SDL_Color Color) 
-{
-	SDL_SetColorKey(Surface, SDL_TRUE, SDL_MapRGB(Surface->format, Color.r, Color.g, Color.b));
-};
 
 void LoadSprites()
 {
-	testSprite = Sprite::OnLoad("./assets/Imgs/Pac-Man.png");
-
-	//Load Img
-	std::string imagePath = "./assets/Imgs/Pac-Man.png";
-	surface = IMG_Load(imagePath.c_str());
-	testSprite = IMG_Load(imagePath.c_str());
-	if (surface == nullptr) {
-		std::cout << "SDL IMG_Load Error: " << SDL_GetError() << std::endl;
-		cleanExit(1);
-	}
-
-	Transparency(surface, SetColor(0, 0, 0));
-
-	tex = SDL_CreateTextureFromSurface(ren, surface);
-	SDL_FreeSurface(surface);
-	if (tex == nullptr) {
-		std::cout << "SDL_CreateTextureFromSurface Error: " << SDL_GetError() << std::endl;
-		cleanExit(1);
-	}
+	tex = Sprite::OnLoad("./assets/Imgs/Pac-Man.png",ren);
 	
-	//each small pacman is 15
-	Sprite_rect[0].x = 455;
-	Sprite_rect[0].y = 0;
-	Sprite_rect[0].w = 15;
-	Sprite_rect[0].h = 15;
-	Sprite_rect[1].x = 472;
-	Sprite_rect[1].y = 0;
-	Sprite_rect[1].w = 15;
-	Sprite_rect[1].h = 15;
-	Sprite_rect[2].x = 488;
-	Sprite_rect[2].y = 0;
-	Sprite_rect[2].w = 15;
-	Sprite_rect[2].h = 15;
-	
-	int test = 455;
-	CurrentSprite = &test;
-
 	//Add Sprites to SpriteList
 	SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO, "Adding sprites...");
 	//Adding Sprites to list with uniquie pointer and		  Sprite X, Y, W, H	Location X, Y, W, H
 	spriteList.emplace("Background", std::unique_ptr<Sprite>(new Sprite(226, 0, 226, 248, 5, 75, 685, 752)));
-	spriteList.emplace("Pacman_Whole", std::unique_ptr<Sprite>(new Sprite(*CurrentSprite,0,15,15,		60,90,42.5,42.5)));
+	spriteList.emplace("Pacman_Whole", std::unique_ptr<Sprite>(new Sprite(455,0,15,15,		60,90,42.5,42.5)));
 	spriteList.emplace("Pacman_Right_1", std::unique_ptr<Sprite>(new Sprite(472,0,15,15,	80,90,42.5,42.5)));
 	spriteList.emplace("Pacman_Right_2", std::unique_ptr<Sprite>(new Sprite(488,0,15,15,	120,90,42.5,42.5)));
 	
