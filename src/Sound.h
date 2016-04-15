@@ -10,7 +10,9 @@ class Sound
 public:
 	Sound();
 
-	static Mix_Chunk* LoadSound(char* File);
+	static Mix_Chunk* LoadSFX(char* File);
+
+	static Mix_Music* Sound::LoadMusic(char* File);
 
 	~Sound();
 };

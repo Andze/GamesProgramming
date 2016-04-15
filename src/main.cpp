@@ -2,6 +2,8 @@
 #include "common.h"
 #include "Sprite.h"
 #include "Text.h"
+#include "Sound.h"
+#include "Score.h"
 
 
 #ifdef _WIN32 // compiling on windows
@@ -63,15 +65,15 @@ std::map<string, unique_ptr<Sprite>> spriteList;
 
 
 //The music that will be played
-Mix_Music *gMusic = NULL;
+Mix_Music *gMusic = nullptr;
 
 //The sound effects that will be used
-Mix_Chunk *SFX_OpeningSong = NULL;
-Mix_Chunk *SFX_WakaWaka = NULL;
-Mix_Chunk *SFX_Dies = NULL;
-Mix_Chunk *SFX_Cherry = NULL;
-Mix_Chunk *SFX_EatingGhost = NULL;
-Mix_Chunk *SFX_ExtraLife = NULL;
+Mix_Chunk *SFX_OpeningSong = nullptr;
+Mix_Chunk *SFX_WakaWaka = nullptr;
+Mix_Chunk *SFX_Dies = nullptr;
+Mix_Chunk *SFX_Cherry = nullptr;
+Mix_Chunk *SFX_EatingGhost = nullptr;
+Mix_Chunk *SFX_ExtraLife = nullptr;
 
 bool W, A, S, D, UP, DOWN, LEFT, RIGHT = false;
 
@@ -281,18 +283,15 @@ void Score()
 	if (loaded == false)
 	{
 		//Load hacktype face
-		font = TTF_OpenFont("./assets/Fonts/Hack-Regular.ttf", 96);
-		if (font == nullptr)
-		{
-			std::cout << "TTF_OpenFont Error: " << TTF_GetError() << std::endl;
-			cleanExit(1);
-			
-		}
+		font = Text::LoadFont("./assets/Fonts/Hack-Regular.ttf", 96);
+		
 		loaded = true;
+
 		std::cout << "FONT LOADED " << std::endl;
 	}
 	if (loaded == true)
 	{	
+		//Draw(font,Score,Color(RGB),Render)
 		//Score variables being pasted into string stream
 		stringstream Pscore, Hscore;
 		Pscore << PlayerScore;
@@ -357,50 +356,16 @@ void LoadSprites()
 void LoadSound()
 {
 	//Load music 
-	gMusic = Sound::LoadSound("./assets/Sound/Pacman Siren Clean Loop.mp3");
-
-	std::string MusicPath = "./assets/Sound/Pacman Siren Clean Loop.mp3";
-	gMusic = Mix_LoadMUS(MusicPath.c_str());
-	if (gMusic == NULL)
-	{
-		printf("Failed to load music! SDL_mixer Error: %s\n", Mix_GetError());
-		cleanExit(1);
-	}
+	gMusic = Sound::LoadMusic("./assets/Sound/Pacman Siren Clean Loop.mp3");
 
 	//Load sound effects
-	std::string OpeningSong = "./assets/Sound/Pacman Opening Song.mp3";
-	SFX_OpeningSong = Mix_LoadWAV(OpeningSong.c_str());
-	if (SFX_OpeningSong == NULL)
-	{
-		printf("Failed to load music! SDL_mixer Error: %s\n", Mix_GetError());
-		cleanExit(1);
-	}
-	//Load sound effects
-	std::string WakaWaka = "./assets/Sound/PacmanWakaWaka1.Wav";
-	SFX_WakaWaka = Mix_LoadWAV(WakaWaka.c_str());
-	if (SFX_WakaWaka == NULL)
-	{
-		printf("Failed to load music! SDL_mixer Error: %s\n", Mix_GetError());
-		cleanExit(1);
-	}
+	SFX_WakaWaka = Sound::LoadSFX("./assets/Sound/PacmanWakaWaka1.Wav");
 
-	//Load sound effects
-	std::string EatingGhost = "./assets/Sound/Pacman Eating Ghost.Wav";
-	SFX_EatingGhost = Mix_LoadWAV(EatingGhost.c_str());
-	if (SFX_EatingGhost == NULL)
-	{
-		printf("Failed to load music! SDL_mixer Error: %s\n", Mix_GetError());
-		cleanExit(1);
-	}
+	SFX_EatingGhost = Sound::LoadSFX("./assets/Sound/Pacman Eating Ghost.Wav");
 
-	//Load sound effects
-	std::string Dies = "./assets/Sound/Pacman Dies.Wav";
-	SFX_Dies = Mix_LoadWAV(Dies.c_str());
-	if (SFX_Dies == NULL)
-	{
-		printf("Failed to load music! SDL_mixer Error: %s\n", Mix_GetError());
-		cleanExit(1);
-	}
+	SFX_Dies = Sound::LoadSFX("./assets/Sound/Pacman Dies.Wav");
+
+	SFX_OpeningSong = Sound::LoadSFX("./assets/Sound/Pacman Opening Song.mp3");
 	
 }
 void init()

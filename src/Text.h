@@ -16,6 +16,8 @@ public:
 	static bool DrawText(SDL_Renderer* ren, SDL_Texture* tex, int x, int y, int w, int h);
 
 	static SDL_Texture* LoadText(char* File, char *text, int size, int R, int G, int B, SDL_Renderer* Render);
+
+	static TTF_Font* LoadFont(char* File, int size);
 };
 
 #endif /* end of include guard: */
