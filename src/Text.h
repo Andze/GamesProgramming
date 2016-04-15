@@ -17,7 +17,6 @@ public:
 
 	static SDL_Texture* LoadText(char* File, char *text, int size, int R, int G, int B, SDL_Renderer* Render);
 
-	static TTF_Font* LoadFont(char* File, int size);
 };
 
 #endif /* end of include guard: */

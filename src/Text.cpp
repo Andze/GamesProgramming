@@ -57,17 +57,6 @@ bool Text::DrawText(SDL_Renderer* ren, SDL_Texture* tex, int x, int y, int w, in
 	return true;
 }
 
-TTF_Font* Text::LoadFont(char* File, int size)
-{
-	TTF_Font* font = TTF_OpenFont(File, size);
-	if (font == nullptr)
-	{
-		std::cout << "TTF_OpenFont Error: " << TTF_GetError() << std::endl;
-
-	}
-
-	return font;
-}
 
 Text::Text(const Text& Text) : rectangle(Text.rectangle)
 {

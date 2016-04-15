@@ -283,7 +283,7 @@ void Score()
 	if (loaded == false)
 	{
 		//Load hacktype face
-		font = Text::LoadFont("./assets/Fonts/Hack-Regular.ttf", 96);
+		font = Score::LoadFont("./assets/Fonts/Hack-Regular.ttf", 96);
 		
 		loaded = true;
 
