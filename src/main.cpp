@@ -19,40 +19,33 @@
 
 using namespace std;
 
+//Window Name
 std::string Pacman;
+//Window
 SDL_Window *win; //pointer to the SDL_Window
-
+//Render
 SDL_Renderer *ren; //pointer to the SDL_Renderer
-SDL_Surface *surface; //pointer to the SDL_Surface
+//Image Texture
 SDL_Texture *tex; //pointer to the SDL_Texture
 
-SDL_Surface *messageSurface; //pointer to the SDL_Surface for message
+//Text
 SDL_Texture *messageTexture; //pointer to the SDL_Texture for message
-SDL_Rect message_rect; //SDL_rect for the message
 
 //Score
-SDL_Rect Score_rect; //SDL_rect for the Score
-SDL_Surface *ScoreSurface;
 SDL_Texture *ScoreTexture;
 //High Score
-SDL_Rect HScore_rect; //SDL_rect for the Score
-SDL_Surface *HScoreSurface = nullptr;
 SDL_Texture *HScoreTexture;
-
-//Sprite
-const int Right = 3;
-SDL_Rect Sprite_rect[ Right ];
-Uint32 sprite;
-
-SDL_Color White = { 255, 255, 255 };
+//Font
 TTF_Font *font = nullptr;
 
-int PlayerScore = 0;
-int HighScore = 0;
-int Temp = 0;
-bool done = false;
-bool loaded = false;
-int *CurrentSprite = NULL;
+//Player
+SDL_Rect Player;
+
+
+
+int PlayerScore = 0, HighScore = 0, Temp = 0;
+bool done = false , loaded = false;
+int *CurrentSprite = nullptr;
 
 
 
@@ -115,15 +108,29 @@ void handleInput()
 
 					case SDLK_UP:
 						UP = true;
+						DOWN = false;
+						RIGHT = false;
+						LEFT = false;
 						break;
 					case SDLK_DOWN:
 						DOWN = true;
+						RIGHT = false;
+						LEFT = false;
+						UP = false;
 						break;
 					case SDLK_RIGHT:
 						RIGHT = true;
+						LEFT = false;
+						UP = false;
+						DOWN = false;
 						break;
 					case SDLK_LEFT:
+						//True
 						LEFT = true;
+						//False
+						UP = false;
+						DOWN = false;
+						RIGHT = false;
 						break;
 
 					case SDLK_1:
@@ -182,39 +189,29 @@ void updateSimulation(double simLength = 0.02) //update simulation with an amoun
   //CHANGE ME
 	if (UP == true)
 	{
-		
+		Player.y -= 3;
 	}
 	if (DOWN == true)
 	{
-
+		Player.y += 3;
 	}
 	if (RIGHT == true)
 	{
-
+		Player.x += 3;
 	}
 	if (LEFT == true)
 	{
-		
+		Player.x -= 3;
 	}
 }
 
 void render()
 {
-		Uint32 ticks = SDL_GetTicks();
-		Uint32 sprite = (ticks / 1000) % 3;
-
 		//First clear the renderer
 		SDL_RenderClear(ren);
 
-		//Draw the texture
-		//SDL_RenderCopy(ren, tex, NULL, NULL);
-
-		//Draw the text
-		//SDL_RenderCopy(ren, messageTexture, NULL, &message_rect);
-
 		//Draw the Score and High Score
-		//SDL_RenderCopy(ren, ScoreTexture, NULL, &Score_rect);
-		//SDL_RenderCopy(ren, HScoreTexture, NULL, &HScore_rect);
+		// DrawScore   Render,Texture,		X,	Y,	W,	H
 		Score::DrawScore(ren, ScoreTexture, 200, 45, 60, 20);
 		Score::DrawScore(ren, HScoreTexture, 370, 45, 60, 20);
 		
@@ -233,9 +230,9 @@ void render()
 		//Drawing Sprites
 		//			Screen,Img,Source Rectangle, Destination Rectangle
 		//Background
-		Sprite::Draw(ren, tex, 226, 0, 226, 248, 5, 75, 685, 752);
+		Sprite::Draw(ren, tex, 600, 0, 600, 656, 5, 75, 685, 752);
 		//Pacman
-		Sprite::Draw(ren, tex, 455, 0, 15, 15, 60, 90, 42.5, 42.5);
+		Sprite::Draw(ren, tex, 1515, 0, 38, 38, Player.x, Player.y, 42, 42);
 		
 		//Drawing Text
 		// DrawText Function, MessageTex, X , Y, W, H,
@@ -244,6 +241,85 @@ void render()
 		//Update the screen
 		SDL_RenderPresent(ren);
 		
+}
+
+
+
+void Score()
+{
+	if (loaded == false)
+	{
+		//Load hacktype face
+		font = Score::LoadFont("./assets/Fonts/Hack-Regular.ttf", 96);
+		
+		loaded = true;
+
+		SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO, "FONT LOADED");
+	}
+	if (loaded == true)
+	{	
+		if (ScoreTexture != nullptr) SDL_DestroyTexture(ScoreTexture);
+		if (HScoreTexture != nullptr) SDL_DestroyTexture(HScoreTexture);
+
+		//LoadScore into Tex(font,Score,Color(RGB),Render)
+		ScoreTexture = Score::LoadScore(font,PlayerScore,255,255,255,ren);
+		//LoadScore into Tex(font,Score,Color(RGB),Render)
+		HScoreTexture = Score::LoadScore(font, HighScore, 255, 255, 255, ren);
+	}
+}		
+
+
+void LoadText()
+{
+	SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO, "Adding Text...");
+
+	//Using Text class to load a message to a texture to be drawn
+	//Texture to store message			Font to be used,				Text,		Size,   ColourRGB,	   Render
+	messageTexture = Text::LoadText("./assets/Fonts/Hack-Regular.ttf", "HIGH SCORE" , 96,	255,255,255,	ren);
+
+	SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO, "Text Loaded");
+}
+
+
+void LoadSprites()
+{	
+	//Set Players intial position
+	Player.x = 60;	Player.y = 90;
+
+	//Add Sprites to SpriteList
+	SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO, "Adding sprites...");
+	
+	//Loads sprite sheet into texture
+	tex = Sprite::OnLoad("./assets/Imgs/Pacman_SpriteSheet.png",ren);
+
+	SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO, "Sprites added");
+	
+	//Adding Sprites to list with uniquie pointer and		  Sprite X, Y, W, H	Location X, Y, W, H
+	/*spriteList.emplace("Background", std::unique_ptr<Sprite>(new Sprite(226, 0, 226, 248, 5, 75, 685, 752)));
+	spriteList.emplace("Pacman_Whole", std::unique_ptr<Sprite>(new Sprite(455,0,15,15,		60,90,42.5,42.5)));
+	spriteList.emplace("Pacman_Right_1", std::unique_ptr<Sprite>(new Sprite(472,0,15,15,	80,90,42.5,42.5)));
+	spriteList.emplace("Pacman_Right_2", std::unique_ptr<Sprite>(new Sprite(488,0,15,15,	120,90,42.5,42.5)));*/	
+}
+
+void LoadSound()
+{
+	//Add Sprites to SpriteList
+	SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO, "Loading Sounds...");
+
+	//Load music 
+	gMusic = Sound::LoadMusic("./assets/Sound/Pacman Siren Clean Loop.mp3");
+
+	//Load sound effects
+	SFX_WakaWaka = Sound::LoadSFX("./assets/Sound/PacmanWakaWaka1.Wav");
+
+	SFX_EatingGhost = Sound::LoadSFX("./assets/Sound/Pacman Eating Ghost.Wav");
+
+	SFX_Dies = Sound::LoadSFX("./assets/Sound/Pacman Dies.Wav");
+
+	SFX_OpeningSong = Sound::LoadSFX("./assets/Sound/Pacman Opening Song.mp3");
+
+	SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO, "Sounds added");
+	
 }
 
 void cleanExit(int returnValue)
@@ -280,74 +356,6 @@ void cleanExit(int returnValue)
 	exit(returnValue);
 }
 
-void Score()
-{
-	if (loaded == false)
-	{
-		//Load hacktype face
-		font = Score::LoadFont("./assets/Fonts/Hack-Regular.ttf", 96);
-		
-		loaded = true;
-
-		std::cout << "FONT LOADED " << std::endl;
-	}
-	if (loaded == true)
-	{	
-		if (ScoreTexture != nullptr) SDL_DestroyTexture(ScoreTexture);
-		if (HScoreTexture != nullptr) SDL_DestroyTexture(HScoreTexture);
-
-		//Draw(font,Score,Color(RGB),Render)
-		ScoreTexture = Score::LoadScore(font,PlayerScore,255,255,255,ren);
-
-		HScoreTexture = Score::LoadScore(font, HighScore, 255, 255, 255, ren);
-	}
-}		
-
-
-void LoadText()
-{
-	SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO, "Adding Text...");
-
-	//Using Text class to load a message to a texture to be drawn
-	//Texture to store message			Font to be used,				Text,		Size,   ColourRGB,	   Render
-	messageTexture = Text::LoadText("./assets/Fonts/Hack-Regular.ttf", "HIGH SCORE" , 96,	255,255,255,	ren);
-
-	SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO, "Text Loaded");
-}
-
-
-void LoadSprites()
-{
-	//Loads sprite sheet into texture
-	tex = Sprite::OnLoad("./assets/Imgs/Pac-Man.png",ren);
-	
-	//Add Sprites to SpriteList
-	SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO, "Adding sprites...");
-	//Adding Sprites to list with uniquie pointer and		  Sprite X, Y, W, H	Location X, Y, W, H
-	spriteList.emplace("Background", std::unique_ptr<Sprite>(new Sprite(226, 0, 226, 248, 5, 75, 685, 752)));
-	spriteList.emplace("Pacman_Whole", std::unique_ptr<Sprite>(new Sprite(455,0,15,15,		60,90,42.5,42.5)));
-	spriteList.emplace("Pacman_Right_1", std::unique_ptr<Sprite>(new Sprite(472,0,15,15,	80,90,42.5,42.5)));
-	spriteList.emplace("Pacman_Right_2", std::unique_ptr<Sprite>(new Sprite(488,0,15,15,	120,90,42.5,42.5)));
-	
-
-	SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO, "Sprites added");
-}
-
-void LoadSound()
-{
-	//Load music 
-	gMusic = Sound::LoadMusic("./assets/Sound/Pacman Siren Clean Loop.mp3");
-
-	//Load sound effects
-	SFX_WakaWaka = Sound::LoadSFX("./assets/Sound/PacmanWakaWaka1.Wav");
-
-	SFX_EatingGhost = Sound::LoadSFX("./assets/Sound/Pacman Eating Ghost.Wav");
-
-	SFX_Dies = Sound::LoadSFX("./assets/Sound/Pacman Dies.Wav");
-
-	SFX_OpeningSong = Sound::LoadSFX("./assets/Sound/Pacman Opening Song.mp3");
-	
-}
 void init()
 {
 	if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
@@ -384,16 +392,18 @@ void init()
 
 	//turning V Sync On 
 	ren = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-
-	//Turning V Sync off
-	//ren = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED );
-
-	if (ren == nullptr)
-	{
+	if (ren == nullptr)	{
 		std::cout << "SDL_CreateRenderer Error: " << SDL_GetError() << std::endl;
 		cleanExit(1);
 	}
+	//Turning V Sync off
+	//ren = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED );
+
+	
 }
+
+
+
 // based on http://www.willusher.io/sdl2%20tutorials/2013/08/17/lesson-1-hello-world/
 int main( int argc, char* args[] )
 {
@@ -422,3 +432,4 @@ int main( int argc, char* args[] )
 	cleanExit(0);
 	return 0;
 }
+
