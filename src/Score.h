@@ -8,12 +8,13 @@ class Score
 {
 public:
 	Score();
+	~Score();
 
 	static TTF_Font* LoadFont(char* File, int size);
 
-	static SDL_Texture* loadScore(TTF_Font* Font, int Score, int R, int G, int B, SDL_Renderer* Render);
+	static SDL_Texture* LoadScore(TTF_Font* Font, int Score, int R, int G, int B, SDL_Renderer* Render);
 
-	~Score();
+	static bool DrawScore(SDL_Renderer* ren, SDL_Texture* tex, int x, int y, int w, int h);
 };
 
 #endif /* end of include guard: */

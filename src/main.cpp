@@ -213,8 +213,10 @@ void render()
 		//SDL_RenderCopy(ren, messageTexture, NULL, &message_rect);
 
 		//Draw the Score and High Score
-		SDL_RenderCopy(ren, ScoreTexture, NULL, &Score_rect);
-		SDL_RenderCopy(ren, HScoreTexture, NULL, &HScore_rect);
+		//SDL_RenderCopy(ren, ScoreTexture, NULL, &Score_rect);
+		//SDL_RenderCopy(ren, HScoreTexture, NULL, &HScore_rect);
+		Score::DrawScore(ren, ScoreTexture, 200, 45, 60, 20);
+		Score::DrawScore(ren, HScoreTexture, 370, 45, 60, 20);
 		
 		//Draw Sprites in sprite list
 		for (auto const& spriteKv : spriteList) //unique_ptr can't be copied, so use reference
@@ -291,36 +293,13 @@ void Score()
 	}
 	if (loaded == true)
 	{	
-		//Draw(font,Score,Color(RGB),Render)
-		//Score variables being pasted into string stream
-		stringstream Pscore, Hscore;
-		Pscore << PlayerScore;
-		Hscore << HighScore;
-
-		if (ScoreSurface != nullptr) SDL_FreeSurface(ScoreSurface);
 		if (ScoreTexture != nullptr) SDL_DestroyTexture(ScoreTexture);
-
-		//Setting Score Int to Score Texture to be used by render to draw
-		ScoreSurface = TTF_RenderText_Solid(font, Pscore.str().c_str(), White);
-		ScoreTexture = SDL_CreateTextureFromSurface(ren, ScoreSurface);
-		//Rect for where the Score is to be drawn
-		Score_rect.x = 200;	
-		Score_rect.y = 45;	
-		Score_rect.w = 60;	
-		Score_rect.h = 20;
-		
-		if (HScoreSurface != nullptr) SDL_FreeSurface(HScoreSurface);
 		if (HScoreTexture != nullptr) SDL_DestroyTexture(HScoreTexture);
 
-		//Setting Score Int to Score Texture to be used by render to draw
-		// delete old surface and delete of texture (if they are not nullptr)
-		HScoreSurface = TTF_RenderText_Solid(font, Hscore.str().c_str(), White);
-		HScoreTexture = SDL_CreateTextureFromSurface(ren, HScoreSurface);
-		//Rect for where the Score is to be drawn
-		HScore_rect.x = 370;	
-		HScore_rect.y = 45;	
-		HScore_rect.w = 60;
-		HScore_rect.h = 20;
+		//Draw(font,Score,Color(RGB),Render)
+		ScoreTexture = Score::LoadScore(font,PlayerScore,255,255,255,ren);
+
+		HScoreTexture = Score::LoadScore(font, HighScore, 255, 255, 255, ren);
 	}
 }		
 
@@ -339,6 +318,7 @@ void LoadText()
 
 void LoadSprites()
 {
+	//Loads sprite sheet into texture
 	tex = Sprite::OnLoad("./assets/Imgs/Pac-Man.png",ren);
 	
 	//Add Sprites to SpriteList
