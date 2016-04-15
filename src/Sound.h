@@ -9,6 +9,9 @@ class Sound
 {
 public:
 	Sound();
+
+	static Mix_Chunk* LoadSound(char* File);
+
 	~Sound();
 };
 

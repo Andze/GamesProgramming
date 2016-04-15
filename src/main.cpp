@@ -53,8 +53,6 @@ bool loaded = false;
 int *CurrentSprite = NULL;
 
 
-SDL_Surface*    Surf_Display;
-SDL_Surface*    Surf_Test;
 
 //std::vector<unique_ptr<Sprite>> spriteList;
 std::map<string, unique_ptr<Sprite>> spriteList;
@@ -358,15 +356,9 @@ void LoadSprites()
 
 void LoadSound()
 {
-	//Initialize SDL_mixer http://lazyfoo.net/tutorials/SDL/21_sound_effects_and_music/index.php
-	//Sound Frequency, Sample format, Hardware channels
-	if (Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 2048) < 0)
-	{
-		std::cout << "SDL_mixer could not initialize! SDL_mixer Error: %s\n" << Mix_GetError() << std::endl;
-		cleanExit(1);
-	}
-
 	//Load music 
+	gMusic = Sound::LoadSound("./assets/Sound/Pacman Siren Clean Loop.mp3");
+
 	std::string MusicPath = "./assets/Sound/Pacman Siren Clean Loop.mp3";
 	gMusic = Mix_LoadMUS(MusicPath.c_str());
 	if (gMusic == NULL)
@@ -413,14 +405,20 @@ void LoadSound()
 }
 void init()
 {
-	Surf_Display = NULL;
-
 	if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
 	{
 		std::cout << "SDL_Init Error: " << SDL_GetError() << std::endl;
 		cleanExit(1);
 	}
 	std::cout << "SDL initialised OK!\n";
+
+	//Initialize SDL_mixer http://lazyfoo.net/tutorials/SDL/21_sound_effects_and_music/index.php
+	//Sound Frequency, Sample format, Hardware channels
+	if (Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 2048) < 0)
+	{
+		std::cout << "SDL_mixer could not initialize! SDL_mixer Error: %s\n" << Mix_GetError() << std::endl;
+		cleanExit(1);
+	}
 
 	//create window
 	win = SDL_CreateWindow("Pacman", 100, 100, 700, 875, SDL_WINDOW_SHOWN);
