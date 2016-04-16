@@ -41,13 +41,9 @@ TTF_Font *font = nullptr;
 //Player
 SDL_Rect Player;
 
-
-
 int PlayerScore = 0, HighScore = 0, Temp = 0;
 bool done = false , loaded = false;
 int *CurrentSprite = nullptr;
-
-
 
 //std::vector<unique_ptr<Sprite>> spriteList;
 std::map<string, unique_ptr<Sprite>> spriteList;
@@ -135,7 +131,6 @@ void handleInput()
 
 					case SDLK_1:
 						Mix_PlayChannel(-1, SFX_OpeningSong, 0);
-						HighScore += 10;
 						break;
 
 						//Play medium sound effect
@@ -152,6 +147,12 @@ void handleInput()
 					case SDLK_4:
 						Mix_PlayChannel(-1, SFX_EatingGhost, 0);
 						break;
+
+						//Add score
+					case SDLK_5:
+						PlayerScore += 10;
+						break;
+						
 
 					case SDLK_9:
 						//If there is no music playing
@@ -205,6 +206,42 @@ void updateSimulation(double simLength = 0.02) //update simulation with an amoun
 	}
 }
 
+void cleanExit(int returnValue)
+{
+	Score::SaveHighScore("./assets/Score/Score.txt", PlayerScore, HighScore);
+
+	if (messageTexture != nullptr) SDL_DestroyTexture(messageTexture);
+	if (tex != nullptr) SDL_DestroyTexture(tex);
+	if (ren != nullptr) SDL_DestroyRenderer(ren);
+	if (win != nullptr) SDL_DestroyWindow(win);
+
+	//Quit SDL_ttf
+	TTF_Quit();
+
+	//Free the sound effects
+	Mix_FreeChunk(SFX_OpeningSong);
+	Mix_FreeChunk(SFX_WakaWaka);
+	Mix_FreeChunk(SFX_Dies);
+	Mix_FreeChunk(SFX_Cherry);
+	Mix_FreeChunk(SFX_EatingGhost);
+	Mix_FreeChunk(SFX_ExtraLife);
+
+	//Set the variables back to empty
+	SFX_OpeningSong = NULL;
+	SFX_WakaWaka = NULL;
+	SFX_Dies = NULL;
+	SFX_Cherry = NULL;
+	SFX_EatingGhost = NULL;
+	SFX_ExtraLife = NULL;
+
+	//Free the music
+	Mix_FreeMusic(gMusic);
+	gMusic = NULL;
+
+	SDL_Quit();
+	exit(returnValue);
+}
+
 void render()
 {
 		//First clear the renderer
@@ -251,7 +288,10 @@ void Score()
 	{
 		//Load hacktype face
 		font = Score::LoadFont("./assets/Fonts/Hack-Regular.ttf", 96);
-		
+
+		//Load in Highscore from txt file
+		HighScore = Score::LoadHighscore("./assets/Score/Score.txt", HighScore);
+
 		loaded = true;
 
 		SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO, "FONT LOADED");
@@ -271,6 +311,8 @@ void Score()
 
 void LoadText()
 {
+	
+
 	SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO, "Adding Text...");
 
 	//Using Text class to load a message to a texture to be drawn
@@ -322,39 +364,7 @@ void LoadSound()
 	
 }
 
-void cleanExit(int returnValue)
-{
-	if (messageTexture != nullptr) SDL_DestroyTexture(messageTexture);
-	if (tex != nullptr) SDL_DestroyTexture(tex);
-	if (ren != nullptr) SDL_DestroyRenderer(ren);
-	if (win != nullptr) SDL_DestroyWindow(win);
 
-	//Quit SDL_ttf
-	TTF_Quit();
-
-	//Free the sound effects
-	Mix_FreeChunk(SFX_OpeningSong);
-	Mix_FreeChunk(SFX_WakaWaka);
-	Mix_FreeChunk(SFX_Dies);
-	Mix_FreeChunk(SFX_Cherry);
-	Mix_FreeChunk(SFX_EatingGhost);
-	Mix_FreeChunk(SFX_ExtraLife);
-
-	//Set the variables back to empty
-	SFX_OpeningSong = NULL;
-	SFX_WakaWaka = NULL;
-	SFX_Dies = NULL;
-	SFX_Cherry = NULL;
-	SFX_EatingGhost = NULL;
-	SFX_ExtraLife = NULL;
-
-	//Free the music
-	Mix_FreeMusic(gMusic);
-	gMusic = NULL;
-
-	SDL_Quit();
-	exit(returnValue);
-}
 
 void init()
 {

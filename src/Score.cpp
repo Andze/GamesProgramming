@@ -61,7 +61,71 @@ bool Score::DrawScore(SDL_Renderer* ren, SDL_Texture* tex, int x, int y, int w, 
 	return true;
 }
 
+int Score::LoadHighscore(char* File,int Score)
+{
 
+	SDL_RWops* file = SDL_RWFromFile(File, "r");
+
+	//File does not exist
+	if (file == nullptr)
+	{
+		printf("Warning: Unable to open file! SDL Error: %s\n", SDL_GetError());
+
+		//Create file for writing
+		file = SDL_RWFromFile(File, "w");
+		if (file != NULL)
+		{
+			printf("New file created!\n");
+
+			SDL_RWwrite(file, 0, sizeof(Score), 1);
+
+			//Close file handler
+			SDL_RWclose(file);
+		}
+		else
+		{
+			printf("Error: Unable to create file! SDL Error: %s\n", SDL_GetError());
+		}
+	}
+	//File exists
+	else
+	{
+		//Load data
+		printf("Reading file...!\n");
+
+		SDL_RWread(file, &Score, sizeof(Score), 1);
+
+		//Close file handler
+		SDL_RWclose(file);
+	}
+
+	return Score;
+}
+
+bool Score::SaveHighScore(char* File, int Score, int HighScore)
+{
+	//Open data for writing
+	SDL_RWops* file = SDL_RWFromFile(File, "w");
+	if (file != nullptr)
+	{
+		if (Score >= HighScore)
+		{
+			HighScore = Score;
+		}
+
+		//Save data
+		SDL_RWwrite(file, &HighScore, sizeof(HighScore), 1);
+
+		//Close file handler
+		SDL_RWclose(file);
+	}
+	else
+	{
+		printf("Error: Unable to save file! %s\n", SDL_GetError());
+	}
+
+	return true;
+}
 
 
 Score::~Score()
