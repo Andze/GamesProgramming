@@ -43,6 +43,7 @@ SDL_Rect Player;
 SDL_Rect Animation;
 
 int PlayerScore = 0, HighScore = 0, Temp = 0;
+int ScreenSize_X = 700, ScreenSize_Y = 875;
 bool done = false , loaded = false;
 int *CurrentSprite = nullptr;
 
@@ -152,6 +153,12 @@ void handleInput()
 						//Add score
 					case SDLK_5:
 						PlayerScore += 10;
+						ScreenSize_X += 10;
+						SDL_SetWindowSize(win, 1080, 720);
+						break;
+
+					case SDLK_6:
+						SDL_SetWindowFullscreen(win, SDL_WINDOW_FULLSCREEN);
 						break;
 						
 
@@ -252,9 +259,11 @@ void cleanExit(int returnValue)
 
 void render()
 {
+		SDL_RenderSetLogicalSize(ren, ScreenSize_X, ScreenSize_Y);
 		//First clear the renderer
 		SDL_RenderClear(ren);
 
+		//SDL_SetWindowSize(win, 1080, 720);
 		//Draw the Score and High Score
 		// DrawScore   Render,Texture,		X,	Y,	W,	H
 		Score::DrawScore(ren, ScoreTexture, 200, 45, 60, 20);
@@ -271,7 +280,7 @@ void render()
 		
 		}
 		//spriteList["Pacman_Whole"]->rectangle
-
+		
 		//Drawing Sprites
 		//			Screen,Img,Source Rectangle, Destination Rectangle
 		//Background
@@ -392,7 +401,7 @@ void init()
 	}
 
 	//create window
-	win = SDL_CreateWindow("Pacman", 100, 100, 700, 875, SDL_WINDOW_SHOWN);
+	win = SDL_CreateWindow("Pacman", 100, 100, ScreenSize_X, ScreenSize_Y, SDL_WINDOW_SHOWN);
 
 	//error handling
 	if (win == nullptr)
