@@ -196,7 +196,11 @@ void updateSimulation(double simLength = 0.02) //update simulation with an amoun
 	if (DOWN == true)
 	{
 		Player.y += 3;
-		Animation.y = 38;
+		Animation.y += 1;
+		if (Animation.y > 152)
+		{
+			Animation.y = 0;
+		}
 	}
 	if (RIGHT == true)
 	{
