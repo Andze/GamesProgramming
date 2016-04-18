@@ -40,6 +40,7 @@ TTF_Font *font = nullptr;
 
 //Player
 SDL_Rect Player;
+SDL_Rect Animation;
 
 int PlayerScore = 0, HighScore = 0, Temp = 0;
 bool done = false , loaded = false;
@@ -195,14 +196,17 @@ void updateSimulation(double simLength = 0.02) //update simulation with an amoun
 	if (DOWN == true)
 	{
 		Player.y += 3;
+		Animation.y = 38;
 	}
 	if (RIGHT == true)
 	{
 		Player.x += 3;
+		Animation.x = (1515 + 38);
 	}
 	if (LEFT == true)
 	{
 		Player.x -= 3;
+		Animation.x = 1515;
 	}
 }
 
@@ -269,7 +273,7 @@ void render()
 		//Background
 		Sprite::Draw(ren, tex, 600, 0, 600, 656, 5, 75, 685, 752);
 		//Pacman
-		Sprite::Draw(ren, tex, 1515, 0, 38, 38, Player.x, Player.y, 42, 42);
+		Sprite::Draw(ren, tex, Animation.x, Animation.y , 38, 38, Player.x, Player.y, 42, 42);
 		
 		//Drawing Text
 		// DrawText Function, MessageTex, X , Y, W, H,
@@ -311,8 +315,6 @@ void Score()
 
 void LoadText()
 {
-	
-
 	SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO, "Adding Text...");
 
 	//Using Text class to load a message to a texture to be drawn
@@ -327,6 +329,9 @@ void LoadSprites()
 {	
 	//Set Players intial position
 	Player.x = 60;	Player.y = 90;
+
+	//Set Players intial position
+	Animation.x = 1515;	Animation.y = 0;
 
 	//Add Sprites to SpriteList
 	SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO, "Adding sprites...");
@@ -361,7 +366,6 @@ void LoadSound()
 	SFX_OpeningSong = Sound::LoadSFX("./assets/Sound/Pacman Opening Song.mp3");
 
 	SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO, "Sounds added");
-	
 }
 
 
