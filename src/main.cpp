@@ -32,7 +32,7 @@ SDL_Texture *tex; //pointer to the SDL_Texture
 SDL_Event event;
 
 //Text
-SDL_Texture *messageTexture[2]; //pointer to the SDL_Texture for message
+SDL_Texture *messageTexture[4]; //pointer to the SDL_Texture for message
 
 SDL_Texture *PauseTexture[3]; //pointer to the SDL_Texture for pause menu
 
@@ -52,11 +52,10 @@ SDL_Rect Animation;
 //Current animation frame 
 int frame = 0;
 
-int PlayerScore = 0, HighScore = 0, Temp = 0;
+int PlayerScore = 0, HighScore = 0, Temp = 0, Lives = 3, Level = 1;
 int ScreenSize_X = 700, ScreenSize_Y = 875;
 //flags to be used
 bool done = false, loaded = false, Menu = true, Pause = false, Game = false , Fullscreen = false;
-int *CurrentSprite = nullptr;
 
 //std::vector<unique_ptr<Sprite>> spriteList;
 std::map<string, unique_ptr<Sprite>> spriteList;
@@ -220,6 +219,7 @@ void handleInput()
 						
 
 					case SDLK_9:
+						Level++;
 						//If there is no music playing
 						if (Mix_PlayingMusic() == 0)
 						{
@@ -335,40 +335,68 @@ void render()
 		
 		Uint32 ticks = SDL_GetTicks();
 		Uint32 seconds = ticks / 1000;
-		Uint32 Pacman1 = seconds % 4;
-		
+		//Diffrent timers for Sprites with more or less frames
 		Uint32 Pacman = (ticks / 100) % 4;
+		Uint32 MenuGhost = (ticks / 200) % 2;
+
 
 		if (Game == true)
 		{
-			//SDL_SetWindowSize(win, 1080, 720);
+			//Draw Ready and player text for a short time
+			//Text::DrawText(ren, messageTexture[3], 225, 330, 250, 50);
+			//Text::DrawText(ren, messageTexture[4], 300, 475, 100, 50);
+
 			//Draw the Score and High Score
 			// DrawScore   Render,Texture,		X,	Y,	W,	H
 			Score::DrawScore(ren, ScoreTexture, 200, 45, 60, 20);
 			Score::DrawScore(ren, HScoreTexture, 370, 45, 60, 20);
 
-			//Draw Sprites in sprite list
-			for (auto const& spriteKv : spriteList) //unique_ptr can't be copied, so use reference
-			{
-				//sprite &thisSprite = spriteKv.second
-				//std::cout << spriteKv.second->Lrectangle.x << std::endl;;
-				//SDL_RenderCopy(ren, tex, &spriteKv.second->Lrectangle, &spriteKv.second->rectangle);
-				//SDL_RenderCopy(ren, tex, &currentClip, &spriteKv.second->rectangle);
-				//spriteList["Pacman_Whole"]->rectangle.x
+			//Drawing Text
+			// DrawText Function, MessageTex,		 X , Y, W, H,
+			Text::DrawText(ren, messageTexture[0], 275, 0, 150, 40);
+			Text::DrawText(ren, messageTexture[1], 180, 0, 50, 40);
 
-			}
-			//spriteList["Pacman_Whole"]->rectangle
 
 			//Drawing Sprites
 			//			Screen,Img,Source Rectangle, Destination Rectangle
 			//Background
 			Sprite::Draw(ren, tex, 600, 0, 600, 656, 5, 75, 685, 752);
+
 			//Pacman
 			Sprite::Draw(ren, tex, Animation.x, Animation.y + (Pacman * 40), 38,  38, Player.x, Player.y, 42, 42);
 
-			//Drawing Text
-			// DrawText Function, MessageTex, X , Y, W, H,
-			Text::DrawText(ren, messageTexture[0], 275, 0, 150, 40);
+			//Level
+			if (Level > 0)
+			{	
+				//Cherry
+				Sprite::Draw(ren, tex, 1390, 0, 38, 38, 600, 830, 42, 42);
+			}
+			if (Level > 1)
+			{
+				//Cherry
+				Sprite::Draw(ren, tex, 1390, 40, 38, 38, 550, 830, 42, 42);
+			}
+			if (Level > 2)
+			{
+				//Cherry
+				Sprite::Draw(ren, tex, 1390, 80, 38, 38, 500, 830, 42, 42);
+			}
+			
+
+			//Lives
+			if (Lives > 1)
+			{
+				Sprite::Draw(ren, tex, 1515, 40, 38, 38, 50 ,830, 42, 42);
+			}
+			if (Lives > 2)
+			{
+				Sprite::Draw(ren, tex, 1515, 40, 38, 38, 100, 830, 42, 42);
+			}
+			if (Lives > 3)
+			{
+				Sprite::Draw(ren, tex, 1515, 40, 38, 38, 150, 830, 42, 42);
+			}
+			
 		}
 
 		if (Pause == true)
@@ -387,12 +415,12 @@ void render()
 		if (Menu == true)
 		{
 			//Drawing Characters next to there text
-			Sprite::Draw(ren, tex, 1758, 0, 40, 40, 150, 200, 40, 40);
-			Sprite::Draw(ren, tex, 1675, 0, 40, 40, 150, 300, 40, 40);
-			Sprite::Draw(ren, tex, 1717, 0, 40, 40, 150, 400, 40, 40);
-			Sprite::Draw(ren, tex, 1635, 0, 40, 40, 150, 500, 40, 40);
+			Sprite::Draw(ren, tex, 1758, MenuGhost * 40, 40, 40, 150, 200, 40, 40);
+			Sprite::Draw(ren, tex, 1675, MenuGhost * 40, 40, 40, 150, 300, 40, 40);
+			Sprite::Draw(ren, tex, 1717, MenuGhost * 40, 40, 40, 150, 400, 40, 40);
+			Sprite::Draw(ren, tex, 1635, MenuGhost * 40, 40, 40, 150, 500, 40, 40);
 
-			
+			//Drawing Dots 
 			Sprite::Draw(ren, tex, 26, 47, 12, 12, 283, 658, 12, 12);
 			Sprite::Draw(ren, tex, 18, 61, 25, 25, 275, 700, 25, 25);
 
@@ -454,6 +482,10 @@ void LoadText()
 	//Using Text class to load a message to a texture to be drawn
 	//Texture to store message			Font to be used,				Text,		Size,   ColourRGB,	   Render
 	messageTexture[0] = Text::LoadText("./assets/Fonts/Hack-Regular.ttf", "HIGH SCORE" , 96,	255,255,255,	ren);
+	messageTexture[1] = Text::LoadText("./assets/Fonts/Hack-Regular.ttf", "1UP", 96, 255, 255, 255, ren);
+	messageTexture[3] = Text::LoadText("./assets/Fonts/Hack-Regular.ttf", "PLAYER ONE", 150, 73, 233, 202, ren);
+	messageTexture[4] = Text::LoadText("./assets/Fonts/Hack-Regular.ttf", "READY!", 150, 245, 255, 0, ren);
+
 
 	//Text used for the Pause menu using the TEXT class to load message onto texture array
 	PauseTexture[1] = Text::LoadText("./assets/Fonts/Hack-Regular.ttf", "Paused",	150,		255, 255, 255,  ren);
@@ -476,7 +508,7 @@ void LoadText()
 void LoadSprites()
 {	
 	//Set Players intial position
-	Player.x = 60;	Player.y = 90;
+	Player.x = 325;	Player.y = 625;
 
 	//Set Players intial position
 	Animation.x = 1515;	Animation.y = 0;
@@ -485,8 +517,8 @@ void LoadSprites()
 	SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO, "Adding sprites...");
 	
 	//Loads sprite sheet into texture
-	tex = Sprite::OnLoad("./assets/Imgs/Pacman_SpriteSheet.png",ren, 0 , 0 , 0);
-	PauseTexture[0] = Sprite::OnLoad("./assets/Imgs/Pacman_SpriteSheet.png", ren, 255 , 0 , 0);
+	tex = Sprite::OnLoad("./assets/Imgs/Pacman_SpriteSheet.png", ren, 0, 0, 0);
+	PauseTexture[0] = Sprite::OnLoad("./assets/Imgs/Pacman_SpriteSheet.png", ren, 255, 0, 0);
 
 	SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO, "Sprites added");
 
@@ -591,3 +623,14 @@ int main( int argc, char* args[] )
 	return 0;
 }
 
+////Draw Sprites in sprite list
+//for (auto const& spriteKv : spriteList) //unique_ptr can't be copied, so use reference
+//{
+//	//sprite &thisSprite = spriteKv.second
+//	//std::cout << spriteKv.second->Lrectangle.x << std::endl;;
+//	//SDL_RenderCopy(ren, tex, &spriteKv.second->Lrectangle, &spriteKv.second->rectangle);
+//	//SDL_RenderCopy(ren, tex, &currentClip, &spriteKv.second->rectangle);
+//	//spriteList["Pacman_Whole"]->rectangle.x
+
+//}
+////spriteList["Pacman_Whole"]->rectangle
