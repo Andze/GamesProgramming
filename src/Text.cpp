@@ -65,5 +65,5 @@ Text::Text(const Text& Text) : rectangle(Text.rectangle)
 
 Text::~Text()
 {
-	SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO, "Sounds Loaded");
+	SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO, "Text Loaded");
 }

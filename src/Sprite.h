@@ -12,7 +12,7 @@ public:
 	Sprite(int xl, int yl, int wl, int hl, int x, int y, int w, int h);
 	Sprite(const Sprite& sprite);
 
-	static SDL_Texture* OnLoad(char* File, SDL_Renderer* Render);
+	static SDL_Texture* OnLoad(char* File, SDL_Renderer* Render, int r, int g, int b);
 
 	static SDL_Color SetColor(int R, int G, int B);
 

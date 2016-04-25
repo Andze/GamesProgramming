@@ -31,14 +31,14 @@ bool Sprite::Transparency(SDL_Surface* Surface, SDL_Color Color)
 	return true;
 };
 
-	SDL_Texture* Sprite::OnLoad(char* File, SDL_Renderer* Render)
+	SDL_Texture* Sprite::OnLoad(char* File, SDL_Renderer* Render,int r,int g,int b)
 {
 	SDL_Surface* Surf_Temp = nullptr;
 	SDL_Texture* Tex_Return = nullptr;
 
 	Surf_Temp =  IMG_Load(File);
 
-	Transparency(Surf_Temp, SetColor(0, 0, 0));
+	Transparency(Surf_Temp, SetColor(r, g, b));
 
 	if (Surf_Temp == nullptr) {
 		std::cout << "SDL IMG_Load Error: " << SDL_GetError() << std::endl;
