@@ -17,6 +17,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
+#include "main.h"
 #endif
 
 using namespace std;
@@ -51,11 +52,55 @@ TTF_Font *font = nullptr;
 SDL_Rect Player;
 SDL_Rect Animation;
 
+//31 x 28
+int const Map_Rows = 31 , Map_Collums = 28;
+
+// enum class
+enum class PacmanGridStates {EMPTY = 2, WALL = 0, PELLET = 1, BIG_PELLET = 3, GATE = 4};
+
+PacmanGridStates Map[Map_Rows][Map_Collums] = {
+	{ PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL } ,
+	{ PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::WALL } ,
+	{ PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL } ,
+	{ PacmanGridStates::WALL, PacmanGridStates::BIG_PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::BIG_PELLET, PacmanGridStates::WALL } ,
+	{ PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL } ,
+	{ PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::WALL } ,
+	{ PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL } ,
+	{ PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL } ,
+	{ PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::WALL } ,
+	{ PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::EMPTY, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::EMPTY, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL } ,
+	{ PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::EMPTY, PacmanGridStates::EMPTY, PacmanGridStates::EMPTY, PacmanGridStates::EMPTY, PacmanGridStates::EMPTY, PacmanGridStates::EMPTY, PacmanGridStates::EMPTY, PacmanGridStates::EMPTY, PacmanGridStates::EMPTY, PacmanGridStates::EMPTY, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL } ,
+	{ PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::EMPTY, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::GATE, PacmanGridStates::GATE, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::EMPTY, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL } ,
+
+	{ PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL } ,
+	{ PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL } ,
+	{ PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL } ,
+	{ PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL } ,
+	{ PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL } ,
+	{ PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL } ,
+	{ PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL } ,
+	{ PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL } ,
+	{ PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL } ,
+	{ PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL } ,
+	{ PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL } ,
+
+	
+
+	{ PacmanGridStates::WALL, PacmanGridStates::BIG_PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::EMPTY, PacmanGridStates::EMPTY, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::BIG_PELLET, PacmanGridStates::WALL } ,   
+	{ PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL } ,   
+	{ PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL } ,
+	{ PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL } ,
+	{ PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL } ,
+	{ PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL } ,
+	{ PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::WALL } ,
+	{ PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL }    
+};
+
 //Current animation frame 
 int frame = 0;
 
 int PlayerScore = 0, HighScore = 0, Temp = 0, Lives = 3, Level = 1;
-int ScreenSize_X = 700, ScreenSize_Y = 875;
+int ScreenSize_X = 700, ScreenSize_Y = 875, GameTimer = 0;
 //flags to be used
 bool done = false, loaded = false, Menu = true, Pause = false, Game = false, Fullscreen = false, OpeningSong = false;
 
@@ -153,7 +198,17 @@ void handleInput()
 							done = true;
 						}
 						break;
-						
+					case SDLK_SPACE:
+						if (Menu == true)
+						{
+							Menu = false;
+							if (Menu == false)
+							{
+								Game = true;
+								Pause = false;
+							}
+						}
+						break;
 
 					case SDLK_UP:
 						UP = true;
@@ -251,6 +306,64 @@ void handleInput()
 }
 // end::handleInput[]
 
+const int pixelPerGridCell = 24;
+const int pixelOffsetX = 16;
+const int pixelOffsetY = 80;
+
+int pixelFromGridX(int GridX)
+{
+	return pixelOffsetX + (GridX * pixelPerGridCell);
+}
+
+int pixelFromGridY(int GridY)
+{
+	return  pixelOffsetY + (GridY * pixelPerGridCell);
+}
+
+int gridFromPixelX(int pixelX)
+{
+	return (pixelX - pixelOffsetX) / pixelPerGridCell; //TODO integer division - check me
+}
+
+int gridFromPixelY(int pixelY)
+{
+	return (pixelY - pixelOffsetY) / pixelPerGridCell;
+}
+
+void collisions()
+{
+	int gridX = gridFromPixelX(Player.x + 20); //tODO softcode and check
+	int gridY = gridFromPixelY(Player.y + 20);
+	//cout << "pacman cell " << gridX << ", " << gridY << std::endl;
+
+	switch (Map[gridY][gridX])
+	{
+	case PacmanGridStates::BIG_PELLET:
+
+		cout << "big pellet" << std::endl;
+		break;
+	case PacmanGridStates::EMPTY:
+		break;
+	case PacmanGridStates::GATE:
+		break;
+	case PacmanGridStates::PELLET:
+		cout << "pellet" << std::endl;
+		Map[gridY][gridX] = PacmanGridStates::EMPTY;
+
+		break;
+	case PacmanGridStates::WALL:
+		if (LEFT == true)
+		{
+			LEFT = false;
+			//RIGHT = true;
+		}
+		break;
+
+	default:
+		break;
+	}
+
+}
 // tag::updateSimulation[]
 void updateSimulation(double simLength = 0.02) //update simulation with an amount of time to simulate for (in seconds)
 {
@@ -262,14 +375,14 @@ void updateSimulation(double simLength = 0.02) //update simulation with an amoun
 		LEFT = false;
 		RIGHT = false;
 	}
-	if (UP == true)
+	if (Game == true && UP == true)
 	{
 		Player.y -= 3;
 
 		Animation.x = 1515;
 		Animation.y = 158;
 	}
-	if (DOWN == true)
+	if (Game == true && DOWN == true)
 	{
 		Player.y += 3;
 		
@@ -277,22 +390,27 @@ void updateSimulation(double simLength = 0.02) //update simulation with an amoun
 		Animation.y = 158;
 	
 	}
-	if (RIGHT == true)
+	if (Game == true && RIGHT == true)
 	{
 		Player.x += 3;
+
 		Animation.y = 0;
 		Animation.x = (1515 + 38);
 	}
-	if (LEFT == true)
+	if (Game == true && LEFT == true)
 	{
 		Player.x -= 3;
+
 		Animation.y = 0;
 		Animation.x = 1515;
 	}
+
+	collisions();
+
 	if (OpeningSong == true)
 	{	
 		Mix_PlayChannel(-1, SFX_OpeningSong, 0);	
-		printf("Playing sound");
+		printf("Playing Opening Song \n");
 		OpeningSong = false;	
 	}
 }
@@ -333,7 +451,8 @@ void cleanExit(int returnValue)
 	exit(returnValue);
 }
 
-unsigned int lastTime = 0, currentTime;
+
+
 
 void render()
 {
@@ -346,36 +465,31 @@ void render()
 		Uint32 seconds = ticks / 1000;
 		//Diffrent timers for Sprites with more or less frames
 		Uint32 Pacman = (ticks / 100) % 4;
-		Uint32 MenuGhost = (ticks / 200) % 2;
+		Uint32 Ghost = (ticks / 200) % 2;
 
 
 		if (Game == true)
 		{
-			//Current time
-			// Print a report once per second
-			currentTime = SDL_GetTicks();
-			if (currentTime > lastTime + 1000) {
-				printf("Report: %d\n", currentTime);
-				lastTime = currentTime;
-			}
+			//5 Second Delay before the game start
+			GameTimer++;
+			if (GameTimer <  220)
+			{	
+				UP = false;
+				DOWN = false;
+				RIGHT = false;
+				LEFT = false;
 
-			////5 Second Delay before the game start
-			//if (Menu <  5000)
-			//{
-			//	//OpeningSong = true;
-			//	
-			//	UP = false;
-			//	DOWN = false;
-			//	RIGHT = false;
-			//	LEFT = false;
+				//Draw Ready and player text for a short time
+				Text::DrawText(ren, messageTexture[3], 225, 330, 250, 50);
+				Text::DrawText(ren, messageTexture[4], 300, 475, 100, 50);
+				
+				if (GameTimer == 1)
+				{
+					OpeningSong = true;
+				}				
+			}	
 
-			//	//Draw Ready and player text for a short time
-			//	Text::DrawText(ren, messageTexture[3], 225, 330, 250, 50);
-			//	Text::DrawText(ren, messageTexture[4], 300, 475, 100, 50);
-			//}
-			
-
-			
+			//28 blocks wide
 
 			//Draw the Score and High Score
 			// DrawScore   Render,Texture,		X,	Y,	W,	H
@@ -392,6 +506,43 @@ void render()
 			//			Screen,Img,Source Rectangle, Destination Rectangle
 			//Background
 			Sprite::Draw(ren, tex, 600, 0, 600, 656, 5, 75, 685, 752);
+
+			//Rows
+			for (int Row = 0; Row < Map_Rows; Row++)
+			{
+				//Collums
+				for (int collum = 0; collum < Map_Collums; collum++)
+				{
+					switch (Map[Row][collum])
+					{	
+					case 1:
+						{
+							//Draw(Yummy)
+							Sprite::Draw(ren, tex, 26, 47, 12, 12, pixelFromGridX(collum), pixelFromGridY(Row), 12, 12);
+						} break;
+
+					case 3:
+						{
+							//Draw(Yummy)
+							Sprite::Draw(ren, tex, 18, 61, 25, 25, pixelFromGridX(collum), pixelFromGridY(Row), 25, 25);
+						} break;
+					}
+				}
+			}
+
+			//Ghosts
+			Sprite::Draw(ren, tex, 1758, Ghost * 40, 40, 40, 280, 400, 40, 40);
+			Sprite::Draw(ren, tex, 1675, Ghost * 40, 40, 40, 320, 400, 40, 40);
+			Sprite::Draw(ren, tex, 1717, Ghost * 40, 40, 40, 360, 400, 40, 40);
+			Sprite::Draw(ren, tex, 1635, Ghost * 40, 40, 40, 400, 400, 40, 40);
+
+			//Drawing Dots
+			//25 spaces
+			//Sprite::Draw(ren, tex, 26, 47, 12, 12, 42, 615, 12, 12);
+			//Sprite::Draw(ren, tex, 26, 47, 12, 12, 42, 590, 12, 12);
+			//Sprite::Draw(ren, tex, 26, 47, 12, 12, 42, 565, 12, 12);
+			////Big dot
+			//Sprite::Draw(ren, tex, 18, 61, 25, 25, 34, 635, 25, 25);
 
 			//Pacman
 			Sprite::Draw(ren, tex, Animation.x, Animation.y + (Pacman * 40), 38,  38, Player.x, Player.y, 42, 42);
@@ -445,11 +596,12 @@ void render()
 
 		if (Menu == true)
 		{
+			GameTimer = 0;
 			//Drawing Characters next to there text
-			Sprite::Draw(ren, tex, 1758, MenuGhost * 40, 40, 40, 150, 200, 40, 40);
-			Sprite::Draw(ren, tex, 1675, MenuGhost * 40, 40, 40, 150, 300, 40, 40);
-			Sprite::Draw(ren, tex, 1717, MenuGhost * 40, 40, 40, 150, 400, 40, 40);
-			Sprite::Draw(ren, tex, 1635, MenuGhost * 40, 40, 40, 150, 500, 40, 40);
+			Sprite::Draw(ren, tex, 1758, Ghost * 40, 40, 40, 150, 200, 40, 40);
+			Sprite::Draw(ren, tex, 1675, Ghost * 40, 40, 40, 150, 300, 40, 40);
+			Sprite::Draw(ren, tex, 1717, Ghost * 40, 40, 40, 150, 400, 40, 40);
+			Sprite::Draw(ren, tex, 1635, Ghost * 40, 40, 40, 150, 500, 40, 40);
 
 			//Drawing Dots 
 			Sprite::Draw(ren, tex, 26, 47, 12, 12, 283, 658, 12, 12);
@@ -516,7 +668,6 @@ void LoadText()
 	messageTexture[1] = Text::LoadText("./assets/Fonts/Hack-Regular.ttf", "1UP", 96, 255, 255, 255, ren);
 	messageTexture[3] = Text::LoadText("./assets/Fonts/Hack-Regular.ttf", "PLAYER ONE", 150, 73, 233, 202, ren);
 	messageTexture[4] = Text::LoadText("./assets/Fonts/Hack-Regular.ttf", "READY!", 150, 245, 255, 0, ren);
-
 
 	//Text used for the Pause menu using the TEXT class to load message onto texture array
 	PauseTexture[1] = Text::LoadText("./assets/Fonts/Hack-Regular.ttf", "Paused",	150,		255, 255, 255,  ren);
