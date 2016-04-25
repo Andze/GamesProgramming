@@ -4,6 +4,7 @@
 #include "Text.h"
 #include "Sound.h"
 #include "Score.h"
+#include "Button.h"
 
 
 #ifdef _WIN32 // compiling on windows
@@ -28,8 +29,14 @@ SDL_Renderer *ren; //pointer to the SDL_Renderer
 //Image Texture
 SDL_Texture *tex; //pointer to the SDL_Texture
 
+SDL_Event event;
+
 //Text
-SDL_Texture *messageTexture; //pointer to the SDL_Texture for message
+SDL_Texture *messageTexture[2]; //pointer to the SDL_Texture for message
+
+SDL_Texture *PauseTexture[3]; //pointer to the SDL_Texture for pause menu
+
+SDL_Texture *MenuTexture[10];
 
 //Score
 SDL_Texture *ScoreTexture;
@@ -42,9 +49,13 @@ TTF_Font *font = nullptr;
 SDL_Rect Player;
 SDL_Rect Animation;
 
+//Current animation frame 
+int frame = 0;
+
 int PlayerScore = 0, HighScore = 0, Temp = 0;
 int ScreenSize_X = 700, ScreenSize_Y = 875;
-bool done = false , loaded = false;
+//flags to be used
+bool done = false, loaded = false, Menu = true, Pause = false, Game = false , Fullscreen = false;
 int *CurrentSprite = nullptr;
 
 //std::vector<unique_ptr<Sprite>> spriteList;
@@ -53,7 +64,6 @@ std::map<string, unique_ptr<Sprite>> spriteList;
 //-> class AnimatedSprite or SpriteAnimation
 
 // orangeGhost , which spritelist is active right now -> class renderableThing, has a list of SpriteAnimation, and which is active
-
 
 //The music that will be played
 Mix_Music *gMusic = nullptr;
@@ -85,6 +95,27 @@ void handleInput()
 	//NOTE: there may be multiple events per frame
 	while (SDL_PollEvent(&event)) //loop until SDL_PollEvent returns 0 (meaning no more events)
 	{
+		if (Pause == true)
+		{
+			Pause = Button::CreateButton(275, 400, 150, 40, &event);
+			Game = Button::CreateButton(300, 500, 100, 40, &event);
+			if (Game == false)
+			{
+				Menu = true;
+				Pause = false;
+			}
+		}
+
+		if (Menu == true)
+		{
+			Menu = Button::CreateButton(275, 775, 150, 40, &event);
+			if (Menu == false)
+			{
+				Game = true;
+				Pause = false;
+			}
+		}
+
 		switch (event.type)
 		{
 		case SDL_QUIT:
@@ -101,8 +132,27 @@ void handleInput()
 			if (!event.key.repeat)
 				switch (event.key.keysym.sym)
 				{
-					//hit escape to exit
-					case SDLK_ESCAPE: done = true;
+					//hit escape to exit or pause if the game is running
+					case SDLK_ESCAPE: 
+						if (Game == true)
+						{
+							if (Pause == false)
+							{
+								Pause = true;
+								SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO, "Pause = true");
+							}
+							else
+							{
+								Pause = false;
+								SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO, "Pause = false");
+							}
+						}
+						if (Menu == true)
+						{
+							done = true;
+						}
+						break;
+						
 
 					case SDLK_UP:
 						UP = true;
@@ -132,33 +182,40 @@ void handleInput()
 						break;
 
 					case SDLK_1:
-						Mix_PlayChannel(-1, SFX_OpeningSong, 0);
+						//Mix_PlayChannel(-1, SFX_OpeningSong, 0);
+						//Set Fullscreen
+						SDL_SetWindowFullscreen(win, SDL_WINDOW_FULLSCREEN);
 						break;
 
 						//Play medium sound effect
 					case SDLK_2:
-						Mix_PlayChannel(-1, SFX_WakaWaka, 0);
+						//Mix_PlayChannel(-1, SFX_WakaWaka, 0);
+						//Set Windowed
+						SDL_SetWindowFullscreen(win, 0);
 						break;
 
 						//Play low sound effect
 					case SDLK_3:
-						Mix_PlayChannel(-1, SFX_Dies, 0);
+						//Mix_PlayChannel(-1, SFX_Dies, 0);
+						//Set original size
+						SDL_SetWindowSize(win, ScreenSize_X, ScreenSize_Y);
 						break;
 
 						//Play scratch sound effect
 					case SDLK_4:
-						Mix_PlayChannel(-1, SFX_EatingGhost, 0);
+						//Mix_PlayChannel(-1, SFX_EatingGhost, 0);
+						//Set Resolution
+						SDL_SetWindowSize(win, 1024, 768);
 						break;
 
 						//Add score
 					case SDLK_5:
 						PlayerScore += 10;
-						ScreenSize_X += 10;
-						SDL_SetWindowSize(win, 1080, 720);
+						SDL_SetWindowSize(win, 1280, 720);
 						break;
 
 					case SDLK_6:
-						SDL_SetWindowFullscreen(win, SDL_WINDOW_FULLSCREEN);
+						SDL_SetWindowSize(win, 1600, 900);
 						break;
 						
 
@@ -196,27 +253,38 @@ void handleInput()
 void updateSimulation(double simLength = 0.02) //update simulation with an amount of time to simulate for (in seconds)
 {
   //CHANGE ME
+	if (Pause == true)
+	{
+		UP = false;
+		DOWN = false;
+		LEFT = false;
+		RIGHT = false;
+	}
 	if (UP == true)
 	{
 		Player.y -= 3;
+
+		Animation.x = 1515;
+		Animation.y = 158;
 	}
 	if (DOWN == true)
 	{
 		Player.y += 3;
-		Animation.y += 1;
-		if (Animation.y > 152)
-		{
-			Animation.y = 0;
-		}
+		
+		Animation.x = (1515 + 38);
+		Animation.y = 158;
+	
 	}
 	if (RIGHT == true)
 	{
 		Player.x += 3;
+		Animation.y = 0;
 		Animation.x = (1515 + 38);
 	}
 	if (LEFT == true)
 	{
 		Player.x -= 3;
+		Animation.y = 0;
 		Animation.x = 1515;
 	}
 }
@@ -225,7 +293,7 @@ void cleanExit(int returnValue)
 {
 	Score::SaveHighScore("./assets/Score/Score.txt", PlayerScore, HighScore);
 
-	if (messageTexture != nullptr) SDL_DestroyTexture(messageTexture);
+	if (messageTexture != nullptr) SDL_DestroyTexture(messageTexture[0]);
 	if (tex != nullptr) SDL_DestroyTexture(tex);
 	if (ren != nullptr) SDL_DestroyRenderer(ren);
 	if (win != nullptr) SDL_DestroyWindow(win);
@@ -257,46 +325,99 @@ void cleanExit(int returnValue)
 	exit(returnValue);
 }
 
+
 void render()
 {
+		//Set logical size so the same images are rendered regardless of window size.
 		SDL_RenderSetLogicalSize(ren, ScreenSize_X, ScreenSize_Y);
 		//First clear the renderer
 		SDL_RenderClear(ren);
+		
+		Uint32 ticks = SDL_GetTicks();
+		Uint32 seconds = ticks / 1000;
+		Uint32 Pacman1 = seconds % 4;
+		
+		Uint32 Pacman = (ticks / 100) % 4;
 
-		//SDL_SetWindowSize(win, 1080, 720);
-		//Draw the Score and High Score
-		// DrawScore   Render,Texture,		X,	Y,	W,	H
-		Score::DrawScore(ren, ScoreTexture, 200, 45, 60, 20);
-		Score::DrawScore(ren, HScoreTexture, 370, 45, 60, 20);
-		
-		//Draw Sprites in sprite list
-		for (auto const& spriteKv : spriteList) //unique_ptr can't be copied, so use reference
+		if (Game == true)
 		{
-			//sprite &thisSprite = spriteKv.second
-			//std::cout << spriteKv.second->Lrectangle.x << std::endl;;
-			//SDL_RenderCopy(ren, tex, &spriteKv.second->Lrectangle, &spriteKv.second->rectangle);
-			//SDL_RenderCopy(ren, tex, &currentClip, &spriteKv.second->rectangle);
-			//spriteList["Pacman_Whole"]->rectangle.x
-		
+			//SDL_SetWindowSize(win, 1080, 720);
+			//Draw the Score and High Score
+			// DrawScore   Render,Texture,		X,	Y,	W,	H
+			Score::DrawScore(ren, ScoreTexture, 200, 45, 60, 20);
+			Score::DrawScore(ren, HScoreTexture, 370, 45, 60, 20);
+
+			//Draw Sprites in sprite list
+			for (auto const& spriteKv : spriteList) //unique_ptr can't be copied, so use reference
+			{
+				//sprite &thisSprite = spriteKv.second
+				//std::cout << spriteKv.second->Lrectangle.x << std::endl;;
+				//SDL_RenderCopy(ren, tex, &spriteKv.second->Lrectangle, &spriteKv.second->rectangle);
+				//SDL_RenderCopy(ren, tex, &currentClip, &spriteKv.second->rectangle);
+				//spriteList["Pacman_Whole"]->rectangle.x
+
+			}
+			//spriteList["Pacman_Whole"]->rectangle
+
+			//Drawing Sprites
+			//			Screen,Img,Source Rectangle, Destination Rectangle
+			//Background
+			Sprite::Draw(ren, tex, 600, 0, 600, 656, 5, 75, 685, 752);
+			//Pacman
+			Sprite::Draw(ren, tex, Animation.x, Animation.y + (Pacman * 40), 38,  38, Player.x, Player.y, 42, 42);
+
+			//Drawing Text
+			// DrawText Function, MessageTex, X , Y, W, H,
+			Text::DrawText(ren, messageTexture[0], 275, 0, 150, 40);
 		}
-		//spriteList["Pacman_Whole"]->rectangle
+
+		if (Pause == true)
+		{
+			//Draw texture for menu
+			Sprite::Draw(ren, PauseTexture[0], 1218, 280, 138, 205, 225, 250, 250, 350);
+			//Draw text for menu
+			Text::DrawText(ren, PauseTexture[1], 275, 300, 150, 40);
+			//Resume Text
+			Text::DrawText(ren, PauseTexture[2], 275, 400, 150, 40);
+			//Quit Text
+			Text::DrawText(ren, PauseTexture[3], 300, 500, 100, 40);
+		}
 		
-		//Drawing Sprites
-		//			Screen,Img,Source Rectangle, Destination Rectangle
-		//Background
-		Sprite::Draw(ren, tex, 600, 0, 600, 656, 5, 75, 685, 752);
-		//Pacman
-		Sprite::Draw(ren, tex, Animation.x, Animation.y , 38, 38, Player.x, Player.y, 42, 42);
-		
-		//Drawing Text
-		// DrawText Function, MessageTex, X , Y, W, H,
-		Text::DrawText(ren, messageTexture, 275, 0, 150, 40);
+
+		if (Menu == true)
+		{
+			//Drawing Characters next to there text
+			Sprite::Draw(ren, tex, 1758, 0, 40, 40, 150, 200, 40, 40);
+			Sprite::Draw(ren, tex, 1675, 0, 40, 40, 150, 300, 40, 40);
+			Sprite::Draw(ren, tex, 1717, 0, 40, 40, 150, 400, 40, 40);
+			Sprite::Draw(ren, tex, 1635, 0, 40, 40, 150, 500, 40, 40);
+
+			
+			Sprite::Draw(ren, tex, 26, 47, 12, 12, 283, 658, 12, 12);
+			Sprite::Draw(ren, tex, 18, 61, 25, 25, 275, 700, 25, 25);
+
+			//Draw text for menu
+			//CHARACTERS / NICKNAME
+			Text::DrawText(ren, MenuTexture[1], 200, 100, 300, 40);
+			//Characters BLINKY,PINKY,INKY,CLYDE
+			Text::DrawText(ren, MenuTexture[2], 200, 200, 300, 40);
+			Text::DrawText(ren, MenuTexture[3], 200, 300, 300, 40);
+			Text::DrawText(ren, MenuTexture[4], 200, 400, 300, 40);
+			Text::DrawText(ren, MenuTexture[5], 200, 500, 300, 40);
+
+			//Point values
+			Text::DrawText(ren, MenuTexture[6], 310, 650, 80, 30);
+			Text::DrawText(ren, MenuTexture[7], 310, 700, 80, 30);
+
+			//Play button
+			Text::DrawText(ren, MenuTexture[8], 275, 775, 150, 40);
+			
+		}
 
 		//Update the screen
 		SDL_RenderPresent(ren);
 		
 }
-
 
 
 void Score()
@@ -332,7 +453,21 @@ void LoadText()
 
 	//Using Text class to load a message to a texture to be drawn
 	//Texture to store message			Font to be used,				Text,		Size,   ColourRGB,	   Render
-	messageTexture = Text::LoadText("./assets/Fonts/Hack-Regular.ttf", "HIGH SCORE" , 96,	255,255,255,	ren);
+	messageTexture[0] = Text::LoadText("./assets/Fonts/Hack-Regular.ttf", "HIGH SCORE" , 96,	255,255,255,	ren);
+
+	//Text used for the Pause menu using the TEXT class to load message onto texture array
+	PauseTexture[1] = Text::LoadText("./assets/Fonts/Hack-Regular.ttf", "Paused",	150,		255, 255, 255,  ren);
+	PauseTexture[2] = Text::LoadText("./assets/Fonts/Hack-Regular.ttf", "Resume", 125, 255, 255, 255, ren);
+	PauseTexture[3] = Text::LoadText("./assets/Fonts/Hack-Regular.ttf", "Quit", 125, 255, 255, 255, ren);
+
+	MenuTexture[1] = Text::LoadText("./assets/Fonts/Hack-Regular.ttf", "  CHARACTER / NICKNAME", 150, 255, 255, 255, ren);
+	MenuTexture[2] = Text::LoadText("./assets/Fonts/Hack-Regular.ttf", "- SHADOW      'BLINKY'", 150, 255, 0, 0, ren);
+	MenuTexture[3] = Text::LoadText("./assets/Fonts/Hack-Regular.ttf", "- SPEEDY      'PINKY'", 150, 252, 190, 227, ren);
+	MenuTexture[4] = Text::LoadText("./assets/Fonts/Hack-Regular.ttf", "- BASHFUL     'INKY'", 150, 73, 233, 202, ren);
+	MenuTexture[5] = Text::LoadText("./assets/Fonts/Hack-Regular.ttf", "- POKEY       'CLYDE'", 150, 255, 191, 81, ren);
+	MenuTexture[6] = Text::LoadText("./assets/Fonts/Hack-Regular.ttf", "10 PTS", 150, 255, 255, 255, ren);
+	MenuTexture[7] = Text::LoadText("./assets/Fonts/Hack-Regular.ttf", "50 PTS", 150, 255, 255, 255, ren);
+	MenuTexture[8] = Text::LoadText("./assets/Fonts/Hack-Regular.ttf", "PLAY", 150, 255, 255, 255, ren);
 
 	SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO, "Text Loaded");
 }
@@ -350,15 +485,11 @@ void LoadSprites()
 	SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO, "Adding sprites...");
 	
 	//Loads sprite sheet into texture
-	tex = Sprite::OnLoad("./assets/Imgs/Pacman_SpriteSheet.png",ren);
+	tex = Sprite::OnLoad("./assets/Imgs/Pacman_SpriteSheet.png",ren, 0 , 0 , 0);
+	PauseTexture[0] = Sprite::OnLoad("./assets/Imgs/Pacman_SpriteSheet.png", ren, 255 , 0 , 0);
 
 	SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO, "Sprites added");
-	
-	//Adding Sprites to list with uniquie pointer and		  Sprite X, Y, W, H	Location X, Y, W, H
-	/*spriteList.emplace("Background", std::unique_ptr<Sprite>(new Sprite(226, 0, 226, 248, 5, 75, 685, 752)));
-	spriteList.emplace("Pacman_Whole", std::unique_ptr<Sprite>(new Sprite(455,0,15,15,		60,90,42.5,42.5)));
-	spriteList.emplace("Pacman_Right_1", std::unique_ptr<Sprite>(new Sprite(472,0,15,15,	80,90,42.5,42.5)));
-	spriteList.emplace("Pacman_Right_2", std::unique_ptr<Sprite>(new Sprite(488,0,15,15,	120,90,42.5,42.5)));*/	
+
 }
 
 void LoadSound()
@@ -399,9 +530,9 @@ void init()
 		std::cout << "SDL_mixer could not initialize! SDL_mixer Error: %s\n" << Mix_GetError() << std::endl;
 		cleanExit(1);
 	}
-
+	 
 	//create window
-	win = SDL_CreateWindow("Pacman", 100, 100, ScreenSize_X, ScreenSize_Y, SDL_WINDOW_SHOWN);
+	win = SDL_CreateWindow("Pacman", 300, 100, ScreenSize_X, ScreenSize_Y, SDL_WINDOW_SHOWN);
 
 	//error handling
 	if (win == nullptr)
