@@ -7,6 +7,7 @@
 #include "Button.h"
 
 
+
 #ifdef _WIN32 // compiling on windows
 #include <SDL.h>
 #include <SDL_image.h>
@@ -28,6 +29,7 @@ SDL_Window *win; //pointer to the SDL_Window
 SDL_Renderer *ren; //pointer to the SDL_Renderer
 //Image Texture
 SDL_Texture *tex; //pointer to the SDL_Texture
+SDL_Texture *tex1; //pointer to the SDL_Texture
 
 SDL_Event event;
 
@@ -55,7 +57,7 @@ int frame = 0;
 int PlayerScore = 0, HighScore = 0, Temp = 0, Lives = 3, Level = 1;
 int ScreenSize_X = 700, ScreenSize_Y = 875;
 //flags to be used
-bool done = false, loaded = false, Menu = true, Pause = false, Game = false , Fullscreen = false;
+bool done = false, loaded = false, Menu = true, Pause = false, Game = false, Fullscreen = false, OpeningSong = false;
 
 //std::vector<unique_ptr<Sprite>> spriteList;
 std::map<string, unique_ptr<Sprite>> spriteList;
@@ -287,6 +289,12 @@ void updateSimulation(double simLength = 0.02) //update simulation with an amoun
 		Animation.y = 0;
 		Animation.x = 1515;
 	}
+	if (OpeningSong == true)
+	{	
+		Mix_PlayChannel(-1, SFX_OpeningSong, 0);	
+		printf("Playing sound");
+		OpeningSong = false;	
+	}
 }
 
 void cleanExit(int returnValue)
@@ -325,6 +333,7 @@ void cleanExit(int returnValue)
 	exit(returnValue);
 }
 
+unsigned int lastTime = 0, currentTime;
 
 void render()
 {
@@ -342,9 +351,31 @@ void render()
 
 		if (Game == true)
 		{
-			//Draw Ready and player text for a short time
-			//Text::DrawText(ren, messageTexture[3], 225, 330, 250, 50);
-			//Text::DrawText(ren, messageTexture[4], 300, 475, 100, 50);
+			//Current time
+			// Print a report once per second
+			currentTime = SDL_GetTicks();
+			if (currentTime > lastTime + 1000) {
+				printf("Report: %d\n", currentTime);
+				lastTime = currentTime;
+			}
+
+			////5 Second Delay before the game start
+			//if (Menu <  5000)
+			//{
+			//	//OpeningSong = true;
+			//	
+			//	UP = false;
+			//	DOWN = false;
+			//	RIGHT = false;
+			//	LEFT = false;
+
+			//	//Draw Ready and player text for a short time
+			//	Text::DrawText(ren, messageTexture[3], 225, 330, 250, 50);
+			//	Text::DrawText(ren, messageTexture[4], 300, 475, 100, 50);
+			//}
+			
+
+			
 
 			//Draw the Score and High Score
 			// DrawScore   Render,Texture,		X,	Y,	W,	H
@@ -402,7 +433,7 @@ void render()
 		if (Pause == true)
 		{
 			//Draw texture for menu
-			Sprite::Draw(ren, PauseTexture[0], 1218, 280, 138, 205, 225, 250, 250, 350);
+			Sprite::Draw(ren, tex1, 1218, 280, 138, 205, 225, 250, 250, 350);
 			//Draw text for menu
 			Text::DrawText(ren, PauseTexture[1], 275, 300, 150, 40);
 			//Resume Text
@@ -518,7 +549,7 @@ void LoadSprites()
 	
 	//Loads sprite sheet into texture
 	tex = Sprite::OnLoad("./assets/Imgs/Pacman_SpriteSheet.png", ren, 0, 0, 0);
-	PauseTexture[0] = Sprite::OnLoad("./assets/Imgs/Pacman_SpriteSheet.png", ren, 255, 0, 0);
+	tex1 = Sprite::OnLoad("./assets/Imgs/Pacman_SpriteSheet.png", ren, 255, 0, 0);
 
 	SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO, "Sprites added");
 
