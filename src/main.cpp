@@ -56,7 +56,7 @@ SDL_Rect Animation;
 int const Map_Rows = 31 , Map_Collums = 28;
 
 // enum class
-enum class PacmanGridStates {EMPTY = 2, WALL = 0, PELLET = 1, BIG_PELLET = 3, GATE = 4};
+enum class PacmanGridStates { EMPTY = 2, WALL = 0, PELLET = 1, BIG_PELLET = 3, GATE = 4 };
 
 PacmanGridStates Map[Map_Rows][Map_Collums] = {
 	{ PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL } ,
@@ -69,47 +69,85 @@ PacmanGridStates Map[Map_Rows][Map_Collums] = {
 	{ PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL } ,
 	{ PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::WALL } ,
 	{ PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::EMPTY, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::EMPTY, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL } ,
+	{ PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::EMPTY, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::EMPTY, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL } ,
 	{ PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::EMPTY, PacmanGridStates::EMPTY, PacmanGridStates::EMPTY, PacmanGridStates::EMPTY, PacmanGridStates::EMPTY, PacmanGridStates::EMPTY, PacmanGridStates::EMPTY, PacmanGridStates::EMPTY, PacmanGridStates::EMPTY, PacmanGridStates::EMPTY, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL } ,
-	{ PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::EMPTY, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::GATE, PacmanGridStates::GATE, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::EMPTY, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL } ,
-
-	{ PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL } ,
-	{ PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL } ,
-	{ PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL } ,
-	{ PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL } ,
-	{ PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL } ,
-	{ PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL } ,
-	{ PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL } ,
-	{ PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL } ,
-	{ PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL } ,
-	{ PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL } ,
-	{ PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL } ,
-
-	
-
-	{ PacmanGridStates::WALL, PacmanGridStates::BIG_PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::EMPTY, PacmanGridStates::EMPTY, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::BIG_PELLET, PacmanGridStates::WALL } ,   
-	{ PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL } ,   
+	//Centre Teleporter Line 
+	{ PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::EMPTY, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::GATE, PacmanGridStates::GATE, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::EMPTY, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL },
+	{ PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::EMPTY, PacmanGridStates::WALL, PacmanGridStates::EMPTY, PacmanGridStates::EMPTY, PacmanGridStates::EMPTY, PacmanGridStates::EMPTY, PacmanGridStates::EMPTY, PacmanGridStates::EMPTY, PacmanGridStates::WALL, PacmanGridStates::EMPTY, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL },
+	{ PacmanGridStates::EMPTY, PacmanGridStates::EMPTY, PacmanGridStates::EMPTY, PacmanGridStates::EMPTY, PacmanGridStates::EMPTY, PacmanGridStates::EMPTY, PacmanGridStates::PELLET, PacmanGridStates::EMPTY, PacmanGridStates::EMPTY, PacmanGridStates::EMPTY, PacmanGridStates::WALL, PacmanGridStates::EMPTY, PacmanGridStates::EMPTY, PacmanGridStates::EMPTY, PacmanGridStates::EMPTY, PacmanGridStates::EMPTY, PacmanGridStates::EMPTY, PacmanGridStates::WALL, PacmanGridStates::EMPTY, PacmanGridStates::EMPTY, PacmanGridStates::EMPTY, PacmanGridStates::PELLET, PacmanGridStates::EMPTY, PacmanGridStates::EMPTY, PacmanGridStates::EMPTY, PacmanGridStates::EMPTY, PacmanGridStates::EMPTY, PacmanGridStates::EMPTY },
+	{ PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::EMPTY, PacmanGridStates::WALL, PacmanGridStates::EMPTY, PacmanGridStates::EMPTY, PacmanGridStates::EMPTY, PacmanGridStates::EMPTY, PacmanGridStates::EMPTY, PacmanGridStates::EMPTY, PacmanGridStates::WALL, PacmanGridStates::EMPTY, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL },
+	{ PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::EMPTY, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::EMPTY, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL },
+	{ PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::EMPTY, PacmanGridStates::EMPTY, PacmanGridStates::EMPTY, PacmanGridStates::EMPTY, PacmanGridStates::EMPTY, PacmanGridStates::EMPTY, PacmanGridStates::EMPTY, PacmanGridStates::EMPTY, PacmanGridStates::EMPTY, PacmanGridStates::EMPTY, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL },
+	{ PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::EMPTY, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::EMPTY, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL },
+	{ PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::EMPTY, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::EMPTY, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL },
+	{ PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::WALL },
+	{ PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL },
+	{ PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL },
+	{ PacmanGridStates::WALL, PacmanGridStates::BIG_PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::EMPTY, PacmanGridStates::EMPTY, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::BIG_PELLET, PacmanGridStates::WALL } ,
 	{ PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL } ,
-	{ PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL } ,
-	{ PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL } ,
+	{ PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL } ,
+	{ PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET,PacmanGridStates::PELLET,PacmanGridStates::PELLET,PacmanGridStates::PELLET,PacmanGridStates::WALL,PacmanGridStates::WALL,PacmanGridStates::PELLET,PacmanGridStates::PELLET,PacmanGridStates::PELLET,PacmanGridStates::PELLET,PacmanGridStates::WALL,PacmanGridStates::WALL,PacmanGridStates::PELLET,PacmanGridStates::PELLET,PacmanGridStates::PELLET,PacmanGridStates::PELLET,PacmanGridStates::WALL,PacmanGridStates::WALL,PacmanGridStates::PELLET,PacmanGridStates::PELLET,PacmanGridStates::PELLET,PacmanGridStates::PELLET,PacmanGridStates::PELLET,PacmanGridStates::PELLET,PacmanGridStates::WALL },
+	{ PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL } ,
 	{ PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL } ,
 	{ PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::PELLET, PacmanGridStates::WALL } ,
-	{ PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL }    
+	{ PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL }
 };
+
+//// enum class
+//enum class PELLETS { EMPTY = 2, WALL = 0, PELLET = 1, BIG_PELLET = 3, GATE = 4 };
+//
+//PELLETS Map2[Map_Rows][Map_Collums] = {
+//	{ PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL } ,
+//	{ PELLETS::WALL, PELLETS::PELLET, PELLETS::PELLET, PELLETS::PELLET, PELLETS::PELLET, PELLETS::PELLET, PELLETS::PELLET, PELLETS::PELLET, PELLETS::PELLET, PELLETS::PELLET, PELLETS::PELLET, PELLETS::PELLET, PELLETS::PELLET, PELLETS::WALL, PELLETS::WALL, PELLETS::PELLET, PELLETS::PELLET, PELLETS::PELLET, PELLETS::PELLET, PELLETS::PELLET, PELLETS::PELLET, PELLETS::PELLET, PELLETS::PELLET, PELLETS::PELLET, PELLETS::PELLET, PELLETS::PELLET, PELLETS::PELLET, PELLETS::WALL } ,
+//	{ PELLETS::WALL, PELLETS::PELLET, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::PELLET, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::PELLET, PELLETS::WALL, PELLETS::WALL, PELLETS::PELLET, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::PELLET, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::PELLET, PELLETS::WALL } ,
+//	{ PELLETS::WALL, PELLETS::BIG_PELLET, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::PELLET, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::PELLET, PELLETS::WALL, PELLETS::WALL, PELLETS::PELLET, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::PELLET, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::BIG_PELLET, PELLETS::WALL } ,
+//	{ PELLETS::WALL, PELLETS::PELLET, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::PELLET, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::PELLET, PELLETS::WALL, PELLETS::WALL, PELLETS::PELLET, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::PELLET, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::PELLET, PELLETS::WALL } ,
+//	{ PELLETS::WALL, PELLETS::PELLET, PELLETS::PELLET, PELLETS::PELLET, PELLETS::PELLET, PELLETS::PELLET, PELLETS::PELLET, PELLETS::PELLET, PELLETS::PELLET, PELLETS::PELLET, PELLETS::PELLET, PELLETS::PELLET, PELLETS::PELLET, PELLETS::PELLET, PELLETS::PELLET, PELLETS::PELLET, PELLETS::PELLET, PELLETS::PELLET, PELLETS::PELLET, PELLETS::PELLET, PELLETS::PELLET, PELLETS::PELLET, PELLETS::PELLET, PELLETS::PELLET, PELLETS::PELLET, PELLETS::PELLET, PELLETS::PELLET, PELLETS::WALL } ,
+//	{ PELLETS::WALL, PELLETS::PELLET, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::PELLET, PELLETS::WALL, PELLETS::WALL, PELLETS::PELLET, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::PELLET, PELLETS::WALL, PELLETS::WALL, PELLETS::PELLET, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::PELLET, PELLETS::WALL } ,
+//	{ PELLETS::WALL, PELLETS::PELLET, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::PELLET, PELLETS::WALL, PELLETS::WALL, PELLETS::PELLET, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::PELLET, PELLETS::WALL, PELLETS::WALL, PELLETS::PELLET, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::PELLET, PELLETS::WALL } ,
+//	{ PELLETS::WALL, PELLETS::PELLET, PELLETS::PELLET, PELLETS::PELLET, PELLETS::PELLET, PELLETS::PELLET, PELLETS::PELLET, PELLETS::WALL, PELLETS::WALL, PELLETS::PELLET, PELLETS::PELLET, PELLETS::PELLET, PELLETS::PELLET, PELLETS::WALL, PELLETS::WALL, PELLETS::PELLET, PELLETS::PELLET, PELLETS::PELLET, PELLETS::PELLET, PELLETS::WALL, PELLETS::WALL, PELLETS::PELLET, PELLETS::PELLET, PELLETS::PELLET, PELLETS::PELLET, PELLETS::PELLET, PELLETS::PELLET, PELLETS::WALL } ,
+//	{ PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::PELLET, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::EMPTY, PELLETS::WALL, PELLETS::WALL, PELLETS::EMPTY, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::PELLET, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL } ,
+//	{ PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::PELLET, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::EMPTY, PELLETS::WALL, PELLETS::WALL, PELLETS::EMPTY, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::PELLET, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL } ,
+//	{ PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::PELLET, PELLETS::WALL, PELLETS::WALL, PELLETS::EMPTY, PELLETS::EMPTY, PELLETS::EMPTY, PELLETS::EMPTY, PELLETS::EMPTY, PELLETS::EMPTY, PELLETS::EMPTY, PELLETS::EMPTY, PELLETS::EMPTY, PELLETS::EMPTY, PELLETS::WALL, PELLETS::WALL, PELLETS::PELLET, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL } ,
+//	//Centre Teleporter Line 
+//	{ PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::PELLET, PELLETS::WALL, PELLETS::WALL, PELLETS::EMPTY, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::GATE, PELLETS::GATE, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::EMPTY, PELLETS::WALL, PELLETS::WALL, PELLETS::PELLET, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL },
+//	{ PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::PELLET, PELLETS::WALL, PELLETS::WALL, PELLETS::EMPTY, PELLETS::WALL, PELLETS::EMPTY, PELLETS::EMPTY, PELLETS::EMPTY, PELLETS::EMPTY, PELLETS::EMPTY, PELLETS::EMPTY, PELLETS::WALL, PELLETS::EMPTY, PELLETS::WALL, PELLETS::WALL, PELLETS::PELLET, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL },
+//	{ PELLETS::EMPTY, PELLETS::EMPTY, PELLETS::EMPTY, PELLETS::EMPTY, PELLETS::EMPTY, PELLETS::EMPTY, PELLETS::PELLET, PELLETS::EMPTY, PELLETS::EMPTY, PELLETS::EMPTY, PELLETS::WALL, PELLETS::EMPTY, PELLETS::EMPTY, PELLETS::EMPTY, PELLETS::EMPTY, PELLETS::EMPTY, PELLETS::EMPTY, PELLETS::WALL, PELLETS::EMPTY, PELLETS::EMPTY, PELLETS::EMPTY, PELLETS::PELLET, PELLETS::EMPTY, PELLETS::EMPTY, PELLETS::EMPTY, PELLETS::EMPTY, PELLETS::EMPTY, PELLETS::EMPTY },
+//	{ PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::PELLET, PELLETS::WALL, PELLETS::WALL, PELLETS::EMPTY, PELLETS::WALL, PELLETS::EMPTY, PELLETS::EMPTY, PELLETS::EMPTY, PELLETS::EMPTY, PELLETS::EMPTY, PELLETS::EMPTY, PELLETS::WALL, PELLETS::EMPTY, PELLETS::WALL, PELLETS::WALL, PELLETS::PELLET, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL },
+//	{ PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::PELLET, PELLETS::WALL, PELLETS::WALL, PELLETS::EMPTY, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::EMPTY, PELLETS::WALL, PELLETS::WALL, PELLETS::PELLET, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL },
+//	{ PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::PELLET, PELLETS::WALL, PELLETS::WALL, PELLETS::EMPTY, PELLETS::EMPTY, PELLETS::EMPTY, PELLETS::EMPTY, PELLETS::EMPTY, PELLETS::EMPTY, PELLETS::EMPTY, PELLETS::EMPTY, PELLETS::EMPTY, PELLETS::EMPTY, PELLETS::WALL, PELLETS::WALL, PELLETS::PELLET, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL },
+//	{ PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::PELLET, PELLETS::WALL, PELLETS::WALL, PELLETS::EMPTY, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::EMPTY, PELLETS::WALL, PELLETS::WALL, PELLETS::PELLET, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL },
+//	{ PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::PELLET, PELLETS::WALL, PELLETS::WALL, PELLETS::EMPTY, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::EMPTY, PELLETS::WALL, PELLETS::WALL, PELLETS::PELLET, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL },
+//	{ PELLETS::WALL, PELLETS::PELLET, PELLETS::PELLET, PELLETS::PELLET, PELLETS::PELLET, PELLETS::PELLET, PELLETS::PELLET, PELLETS::PELLET, PELLETS::PELLET, PELLETS::PELLET, PELLETS::PELLET, PELLETS::PELLET, PELLETS::PELLET, PELLETS::WALL, PELLETS::WALL, PELLETS::PELLET, PELLETS::PELLET, PELLETS::PELLET, PELLETS::PELLET, PELLETS::PELLET, PELLETS::PELLET, PELLETS::PELLET, PELLETS::PELLET, PELLETS::PELLET, PELLETS::PELLET, PELLETS::PELLET, PELLETS::PELLET, PELLETS::WALL },
+//	{ PELLETS::WALL, PELLETS::PELLET, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::PELLET, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::PELLET, PELLETS::WALL, PELLETS::WALL, PELLETS::PELLET, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::PELLET, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::PELLET, PELLETS::WALL },
+//	{ PELLETS::WALL, PELLETS::PELLET, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::PELLET, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::PELLET, PELLETS::WALL, PELLETS::WALL, PELLETS::PELLET, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::PELLET, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::PELLET, PELLETS::WALL },
+//	{ PELLETS::WALL, PELLETS::BIG_PELLET, PELLETS::PELLET, PELLETS::PELLET, PELLETS::WALL, PELLETS::WALL, PELLETS::PELLET, PELLETS::PELLET, PELLETS::PELLET, PELLETS::PELLET, PELLETS::PELLET, PELLETS::PELLET, PELLETS::PELLET, PELLETS::EMPTY, PELLETS::EMPTY, PELLETS::PELLET, PELLETS::PELLET, PELLETS::PELLET, PELLETS::PELLET, PELLETS::PELLET, PELLETS::PELLET, PELLETS::PELLET, PELLETS::WALL, PELLETS::WALL, PELLETS::PELLET, PELLETS::PELLET, PELLETS::BIG_PELLET, PELLETS::WALL } ,
+//	{ PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::PELLET, PELLETS::WALL, PELLETS::WALL, PELLETS::PELLET, PELLETS::WALL, PELLETS::WALL, PELLETS::PELLET, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::PELLET, PELLETS::WALL, PELLETS::WALL, PELLETS::PELLET, PELLETS::WALL, PELLETS::WALL, PELLETS::PELLET, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL } ,
+//	{ PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::PELLET, PELLETS::WALL, PELLETS::WALL, PELLETS::PELLET, PELLETS::WALL, PELLETS::WALL, PELLETS::PELLET, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::PELLET, PELLETS::WALL, PELLETS::WALL, PELLETS::PELLET, PELLETS::WALL, PELLETS::WALL, PELLETS::PELLET, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL } ,
+//	{ PELLETS::WALL, PELLETS::PELLET, PELLETS::PELLET, PELLETS::PELLET,PELLETS::PELLET,PELLETS::PELLET,PELLETS::PELLET,PELLETS::WALL,PELLETS::WALL,PELLETS::PELLET,PELLETS::PELLET,PELLETS::PELLET,PELLETS::PELLET,PELLETS::WALL,PELLETS::WALL,PELLETS::PELLET,PELLETS::PELLET,PELLETS::PELLET,PELLETS::PELLET,PELLETS::WALL,PELLETS::WALL,PELLETS::PELLET,PELLETS::PELLET,PELLETS::PELLET,PELLETS::PELLET,PELLETS::PELLET,PELLETS::PELLET,PELLETS::WALL },
+//	{ PELLETS::WALL, PELLETS::PELLET, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::PELLET, PELLETS::WALL, PELLETS::WALL, PELLETS::PELLET, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::PELLET, PELLETS::WALL } ,
+//	{ PELLETS::WALL, PELLETS::PELLET, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::PELLET, PELLETS::WALL, PELLETS::WALL, PELLETS::PELLET, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::PELLET, PELLETS::WALL } ,
+//	{ PELLETS::WALL, PELLETS::PELLET, PELLETS::PELLET, PELLETS::PELLET, PELLETS::PELLET, PELLETS::PELLET, PELLETS::PELLET, PELLETS::PELLET, PELLETS::PELLET, PELLETS::PELLET, PELLETS::PELLET, PELLETS::PELLET, PELLETS::PELLET, PELLETS::PELLET, PELLETS::PELLET, PELLETS::PELLET, PELLETS::PELLET, PELLETS::PELLET, PELLETS::PELLET, PELLETS::PELLET, PELLETS::PELLET, PELLETS::PELLET, PELLETS::PELLET, PELLETS::PELLET, PELLETS::PELLET, PELLETS::PELLET, PELLETS::PELLET, PELLETS::WALL } ,
+//	{ PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL, PELLETS::WALL }
+//};
+//
+//
+void LoadMap()
+{
+	
+}
+
 
 //Current animation frame 
 int frame = 0;
 
-int PlayerScore = 0, HighScore = 0, Temp = 0, Lives = 3, Level = 1;
+int PlayerScore = 0, HighScore = 0, Temp = 0, Lives = 3, Level = 1, Pellets = 244;
 int ScreenSize_X = 700, ScreenSize_Y = 875, GameTimer = 0;
 //flags to be used
-bool done = false, loaded = false, Menu = true, Pause = false, Game = false, Fullscreen = false, OpeningSong = false;
+bool done = false, loaded = false, Menu = true, Pause = false, Game = false, Fullscreen = false, OpeningSong = false, Levelwin = false;
 
 //std::vector<unique_ptr<Sprite>> spriteList;
 std::map<string, unique_ptr<Sprite>> spriteList;
-
-//-> class AnimatedSprite or SpriteAnimation
-
-// orangeGhost , which spritelist is active right now -> class renderableThing, has a list of SpriteAnimation, and which is active
 
 //The music that will be played
 Mix_Music *gMusic = nullptr;
@@ -147,6 +185,7 @@ void handleInput()
 			Game = Button::CreateButton(300, 500, 100, 40, &event);
 			if (Game == false)
 			{
+				Player.x = 325;	Player.y = 620;
 				Menu = true;
 				Pause = false;
 			}
@@ -157,6 +196,7 @@ void handleInput()
 			Menu = Button::CreateButton(275, 775, 150, 40, &event);
 			if (Menu == false)
 			{
+				LoadMap();
 				Game = true;
 				Pause = false;
 			}
@@ -272,6 +312,7 @@ void handleInput()
 
 					case SDLK_6:
 						SDL_SetWindowSize(win, 1600, 900);
+						Levelwin == true;
 						break;
 						
 
@@ -309,6 +350,8 @@ void handleInput()
 const int pixelPerGridCell = 24;
 const int pixelOffsetX = 16;
 const int pixelOffsetY = 80;
+const int WallOffset = 10;
+const int BIG_PELLET_Offset = 8;
 
 int pixelFromGridX(int GridX)
 {
@@ -332,35 +375,64 @@ int gridFromPixelY(int pixelY)
 
 void collisions()
 {
-	int gridX = gridFromPixelX(Player.x + 20); //tODO softcode and check
-	int gridY = gridFromPixelY(Player.y + 20);
+	int gridX = gridFromPixelX(Player.x + 25); //tODO softcode and check
+	int gridY = gridFromPixelY(Player.y + 25);
+	
 	//cout << "pacman cell " << gridX << ", " << gridY << std::endl;
 
 	switch (Map[gridY][gridX])
 	{
-	case PacmanGridStates::BIG_PELLET:
 
+	case PacmanGridStates::BIG_PELLET:
 		cout << "big pellet" << std::endl;
+		Map[gridY][gridX] = PacmanGridStates::EMPTY;
+		PlayerScore += 50;
+		Pellets--;
+		cout << Pellets << std::endl;
 		break;
-	case PacmanGridStates::EMPTY:
-		break;
-	case PacmanGridStates::GATE:
-		break;
+
 	case PacmanGridStates::PELLET:
 		cout << "pellet" << std::endl;
 		Map[gridY][gridX] = PacmanGridStates::EMPTY;
+		PlayerScore += 10;
+		Pellets--;
+		if (Pellets == 0)
+		{
+			Map[gridY][gridX] = PacmanGridStates::PELLET;
+		}
+		break;
 
+	case PacmanGridStates::EMPTY:
+
+		break;
+	case PacmanGridStates::GATE:
 		break;
 	case PacmanGridStates::WALL:
 		if (LEFT == true)
 		{
 			LEFT = false;
-			//RIGHT = true;
+			Player.x += WallOffset;
+		}
+		if (RIGHT == true)
+		{
+			RIGHT = false;
+			Player.x -= WallOffset;
+		}
+		if (UP == true)
+		{
+			UP = false;
+			Player.y += WallOffset;
+		}
+		if (DOWN == true)
+		{
+			DOWN = false;
+			Player.y -= WallOffset;
 		}
 		break;
 
 	default:
 		break;
+	
 	}
 
 }
@@ -405,6 +477,18 @@ void updateSimulation(double simLength = 0.02) //update simulation with an amoun
 		Animation.x = 1515;
 	}
 
+	if (Game == true && Pellets == 0)
+	{
+		LEFT = false;
+		UP = false;
+		RIGHT = false;
+		DOWN = false;
+
+		Game = false;
+		Pause = false;
+		Menu = true;
+	}
+
 	collisions();
 
 	if (OpeningSong == true)
@@ -413,6 +497,8 @@ void updateSimulation(double simLength = 0.02) //update simulation with an amoun
 		printf("Playing Opening Song \n");
 		OpeningSong = false;	
 	}
+
+
 }
 
 void cleanExit(int returnValue)
@@ -450,8 +536,6 @@ void cleanExit(int returnValue)
 	SDL_Quit();
 	exit(returnValue);
 }
-
-
 
 
 void render()
@@ -499,13 +583,13 @@ void render()
 			//Drawing Text
 			// DrawText Function, MessageTex,		 X , Y, W, H,
 			Text::DrawText(ren, messageTexture[0], 275, 0, 150, 40);
-			Text::DrawText(ren, messageTexture[1], 180, 0, 50, 40);
+			Text::DrawText(ren, messageTexture[Ghost + 1], 180, 0, 50, 40);
 
 
 			//Drawing Sprites
 			//			Screen,Img,Source Rectangle, Destination Rectangle
 			//Background
-			Sprite::Draw(ren, tex, 600, 0, 600, 656, 5, 75, 685, 752);
+			Sprite::Draw(ren, tex, 600, 0, 600, 656, 5, 75, 685, 745);
 
 			//Rows
 			for (int Row = 0; Row < Map_Rows; Row++)
@@ -515,16 +599,16 @@ void render()
 				{
 					switch (Map[Row][collum])
 					{	
-					case 1:
+					case  PacmanGridStates::PELLET:
 						{
 							//Draw(Yummy)
 							Sprite::Draw(ren, tex, 26, 47, 12, 12, pixelFromGridX(collum), pixelFromGridY(Row), 12, 12);
 						} break;
 
-					case 3:
+					case  PacmanGridStates::BIG_PELLET:
 						{
 							//Draw(Yummy)
-							Sprite::Draw(ren, tex, 18, 61, 25, 25, pixelFromGridX(collum), pixelFromGridY(Row), 25, 25);
+							Sprite::Draw(ren, tex, 18 + (Ghost* 40), 61, 25, 25, pixelFromGridX(collum) - BIG_PELLET_Offset, pixelFromGridY(Row) - BIG_PELLET_Offset, 25, 25);
 						} break;
 					}
 				}
@@ -535,14 +619,6 @@ void render()
 			Sprite::Draw(ren, tex, 1675, Ghost * 40, 40, 40, 320, 400, 40, 40);
 			Sprite::Draw(ren, tex, 1717, Ghost * 40, 40, 40, 360, 400, 40, 40);
 			Sprite::Draw(ren, tex, 1635, Ghost * 40, 40, 40, 400, 400, 40, 40);
-
-			//Drawing Dots
-			//25 spaces
-			//Sprite::Draw(ren, tex, 26, 47, 12, 12, 42, 615, 12, 12);
-			//Sprite::Draw(ren, tex, 26, 47, 12, 12, 42, 590, 12, 12);
-			//Sprite::Draw(ren, tex, 26, 47, 12, 12, 42, 565, 12, 12);
-			////Big dot
-			//Sprite::Draw(ren, tex, 18, 61, 25, 25, 34, 635, 25, 25);
 
 			//Pacman
 			Sprite::Draw(ren, tex, Animation.x, Animation.y + (Pacman * 40), 38,  38, Player.x, Player.y, 42, 42);
@@ -580,7 +656,7 @@ void render()
 			}
 			
 		}
-
+		
 		if (Pause == true)
 		{
 			//Draw texture for menu
@@ -690,7 +766,7 @@ void LoadText()
 void LoadSprites()
 {	
 	//Set Players intial position
-	Player.x = 325;	Player.y = 625;
+	Player.x = 325;	Player.y = 620;
 
 	//Set Players intial position
 	Animation.x = 1515;	Animation.y = 0;
@@ -730,6 +806,7 @@ void LoadSound()
 
 void init()
 {
+	LoadMap();
 	if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
 	{
 		std::cout << "SDL_Init Error: " << SDL_GetError() << std::endl;
