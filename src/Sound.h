@@ -14,6 +14,8 @@ public:
 
 	static Mix_Music* Sound::LoadMusic(char* File);
 
+	static bool PlaySound(Mix_Chunk *SFX, int channel);
+
 	~Sound();
 };
 

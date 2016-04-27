@@ -100,10 +100,9 @@ int PlayerScore = 0, HighScore = 0, Temp = 0, Lives = 3, Level = 1, Pellets = 24
 int const Start_X = 325, Start_Y = 620;
 int ScreenSize_X = 700, ScreenSize_Y = 875, GameTimer = 0;
 //flags to be used
-bool done = false, loaded = false, Menu = true, Pause = false, Game = false, Fullscreen = false, OpeningSong = false, Levelwin = false, Reset = false;
+bool done = false, loaded = false, Menu = true, Pause = false, Game = false, Fullscreen = false, OpeningSong = false, Levelwin = false, Reset = false, Music = false, BigPellet = false;
 
-//std::vector<unique_ptr<Sprite>> spriteList;
-std::map<string, unique_ptr<Sprite>> spriteList;
+int Ghost1 = 1758;
 
 //The music that will be played
 Mix_Music *gMusic = nullptr;
@@ -118,6 +117,39 @@ Mix_Chunk *SFX_ExtraLife = nullptr;
 
 bool W, A, S, D, UP, DOWN, LEFT, RIGHT = false;
 
+void PauseMusic()
+{
+	if (Mix_PlayingMusic() == 0)
+	{
+		//Play the music
+		Mix_PlayMusic(gMusic, -1);
+	}
+	//If music is being played
+	else
+	{
+		//If the music is paused
+		if (Mix_PausedMusic() == 1)
+		{
+			//Resume the music
+			Mix_ResumeMusic();
+		}
+		//If the music is playing
+		else
+		{
+			//Pause the music
+			Mix_PauseMusic();
+		}
+	}
+}
+void StartGame()
+{
+	//Reset Score
+	PlayerScore = 0;
+	//Reset Level
+	Level = 1;
+	//Reset Players postion
+	Player.x = Start_X;	Player.y = Start_Y;
+}
 void handleInput()
 {
 	//Event-based input handling
@@ -141,13 +173,8 @@ void handleInput()
 			Game = Button::CreateButton(300, 500, 100, 40, &event);
 			if (Game == false)
 			{
-				//Reset Score
-				PlayerScore = 0;
-				//Reset Level
-				Level = 1;
-				//Reset Players postion
-				Player.x = Start_X;	Player.y = Start_Y;
-
+				//Initialise variables such as score, level and player pos
+				StartGame();
 				//Load Menus
 				Menu = true;
 				Pause = false;
@@ -161,10 +188,17 @@ void handleInput()
 			{
 				//Every time play button is pressed Reset the level map pellets
 				Reset = true;
+
+				//Set game flag for render and simulation
 				Game = true;
+
+				//Play the music for game
+				Mix_PlayMusic(gMusic, -1);
+				
 				Pause = false;
 			}
-		}
+		}				
+	
 
 		switch (event.type)
 		{
@@ -189,19 +223,19 @@ void handleInput()
 							if (Pause == false)
 							{
 								Pause = true;
+								PauseMusic();
 								SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO, "Pause = true");
 							}
 							else
 							{
 								Pause = false;
+								PauseMusic();
 								SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO, "Pause = false");
 							}
 						}
-						if (Menu == true)
-						{
-							done = true;
-						}
+						if (Menu == true)	{done = true;}
 						break;
+
 					case SDLK_SPACE:
 						if (Menu == true)
 						{
@@ -216,33 +250,25 @@ void handleInput()
 
 					case SDLK_UP:
 						UP = true;
-						DOWN = false;
-						RIGHT = false;
-						LEFT = false;
+						DOWN = false; RIGHT = false; LEFT = false;
 						break;
+
 					case SDLK_DOWN:
 						DOWN = true;
-						RIGHT = false;
-						LEFT = false;
-						UP = false;
+						RIGHT = false; LEFT = false; UP = false;
 						break;
+
 					case SDLK_RIGHT:
 						RIGHT = true;
-						LEFT = false;
-						UP = false;
-						DOWN = false;
+						LEFT = false; UP = false; DOWN = false;
 						break;
+
 					case SDLK_LEFT:
-						//True
 						LEFT = true;
-						//False
-						UP = false;
-						DOWN = false;
-						RIGHT = false;
+						UP = false;	DOWN = false; RIGHT = false;
 						break;
 
 					case SDLK_1:
-						//Mix_PlayChannel(-1, SFX_OpeningSong, 0);
 						//Set Fullscreen
 						SDL_SetWindowFullscreen(win, SDL_WINDOW_FULLSCREEN);
 						break;
@@ -276,34 +302,13 @@ void handleInput()
 
 					case SDLK_6:
 						SDL_SetWindowSize(win, 1600, 900);
-						Levelwin == true;
+						
 						break;
 						
 
 					case SDLK_9:
-						Level++;
-						//If there is no music playing
-						if (Mix_PlayingMusic() == 0)
-						{
-							//Play the music
-							Mix_PlayMusic(gMusic, -1);
-						}
-						//If music is being played
-						else
-						{
-							//If the music is paused
-							if (Mix_PausedMusic() == 1)
-							{
-								//Resume the music
-								Mix_ResumeMusic();
-							}
-							//If the music is playing
-							else
-							{
-								//Pause the music
-								Mix_PauseMusic();
-							}
-						}
+						break;
+					
 				}
 			break;
 		}
@@ -336,6 +341,7 @@ void ResetMap()
 	}
 }
 
+const int PlayerSpeed = 3;
 const int pixelPerGridCell = 24;
 const int pixelOffsetX = 16;
 const int pixelOffsetY = 80;
@@ -373,22 +379,32 @@ void collisions()
 	{
 
 	case PacmanGridStates::BIG_PELLET:
-		cout << "big pellet" << std::endl;
-		Map[gridY][gridX] = PacmanGridStates::EATEN_BIG;
-		PlayerScore += 50;
-		Pellets--;
-		cout << Pellets << std::endl;
-		break;
 
-	case PacmanGridStates::PELLET:
-		cout << "pellet" << std::endl;
+		Map[gridY][gridX] = PacmanGridStates::EATEN_BIG;
+
+		Sound::PlaySound(SFX_WakaWaka, 1);
+
+		PlayerScore += 50;
+
+		Pellets--;
+
+		BigPellet = true;
+		Ghost1 = 1266;
+
+		break;
+		
+	case PacmanGridStates::PELLET: //Collide with pellet
+		//Change state in the grid to eaten
 		Map[gridY][gridX] = PacmanGridStates::EATEN;
+		//Plat SFX
+		Sound::PlaySound(SFX_WakaWaka,1);
+		//Incriment score
 		PlayerScore += 10;
+		//take 1 away from the pellet count to keep track of the level progression
 		Pellets--;
 		break;
 
 	case PacmanGridStates::EMPTY:
-
 		break;
 	case PacmanGridStates::GATE:
 		break;
@@ -424,58 +440,50 @@ void collisions()
 // tag::updateSimulation[]
 void updateSimulation(double simLength = 0.02) //update simulation with an amount of time to simulate for (in seconds)
 {
+	//Reset Pellets
 	if (Reset == true)
 	{
 		ResetMap();
 		Pellets = 244;
 		Reset = false;
 	}
-
+	//Pause Menu ON
 	if (Pause == true)
 	{
-		UP = false;
-		DOWN = false;
-		LEFT = false;
-		RIGHT = false;
+		//Freeze Movement
+		UP = false; DOWN = false; LEFT = false; RIGHT = false;
 	}
+	//Movement------------------------------------------------
 	if (Game == true && UP == true)
 	{
-		Player.y -= 3;
+		Player.y -= PlayerSpeed;
 
-		Animation.x = 1515;
-		Animation.y = 158;
+		Animation.x = 1515;Animation.y = 158;	
 	}
 	if (Game == true && DOWN == true)
 	{
-		Player.y += 3;
+		Player.y += PlayerSpeed;
 		
-		Animation.x = (1515 + 38);
-		Animation.y = 158;
-	
+		Animation.x = (1515 + 38);Animation.y = 158;
 	}
 	if (Game == true && RIGHT == true)
 	{
-		Player.x += 3;
+		Player.x += PlayerSpeed;
 
-		Animation.y = 0;
-		Animation.x = (1515 + 38);
+		Animation.x = (1515 + 38);Animation.y = 0;
 	}
 	if (Game == true && LEFT == true)
 	{
-		Player.x -= 3;
+		Player.x -= PlayerSpeed;
 
-		Animation.y = 0;
-		Animation.x = 1515;
+		Animation.x = 1515; Animation.y = 0;
 	}
 
 	//Win State
 	if (Game == true && Pellets == 0)
 	{
 		//Timer------------- 
-		LEFT = false;
-		UP = false;
-		RIGHT = false;
-		DOWN = false;
+		LEFT = false;UP = false;RIGHT = false;DOWN = false;
 		//play animation--------------
 		//reset everything
 		Player.x = Start_X, Player.y = Start_Y;
@@ -490,7 +498,8 @@ void updateSimulation(double simLength = 0.02) //update simulation with an amoun
 
 	if (OpeningSong == true)
 	{	
-		Mix_PlayChannel(-1, SFX_OpeningSong, 0);	
+		//Mix_PlayChannel(-1, SFX_OpeningSong, 0);	
+		Sound::PlaySound(SFX_OpeningSong, -1);
 		printf("Playing Opening Song \n");
 		OpeningSong = false;	
 	}
@@ -535,6 +544,7 @@ void cleanExit(int returnValue)
 }
 
 
+
 void render()
 {
 		//Set logical size so the same images are rendered regardless of window size.
@@ -568,7 +578,11 @@ void render()
 				{
 					OpeningSong = true;
 				}				
-			}	
+			}
+			else
+			{
+				Music = true;
+			}
 
 			//28 blocks wide
 
@@ -612,7 +626,7 @@ void render()
 			}
 
 			//Ghosts
-			Sprite::Draw(ren, tex, 1758, Ghost * 40, 40, 40, 280, 400, 40, 40);
+			Sprite::Draw(ren, tex, Ghost1, Ghost * 40, 40, 40, 280, 400, 40, 40);
 			Sprite::Draw(ren, tex, 1675, Ghost * 40, 40, 40, 320, 400, 40, 40);
 			Sprite::Draw(ren, tex, 1717, Ghost * 40, 40, 40, 360, 400, 40, 40);
 			Sprite::Draw(ren, tex, 1635, Ghost * 40, 40, 40, 400, 400, 40, 40);
@@ -788,7 +802,7 @@ void LoadSound()
 	gMusic = Sound::LoadMusic("./assets/Sound/Pacman Siren Clean Loop.mp3");
 
 	//Load sound effects
-	SFX_WakaWaka = Sound::LoadSFX("./assets/Sound/PacmanWakaWaka1.Wav");
+	SFX_WakaWaka = Sound::LoadSFX("./assets/Sound/PacmanWakaWaka2.Wav");
 
 	SFX_EatingGhost = Sound::LoadSFX("./assets/Sound/Pacman Eating Ghost.Wav");
 
@@ -848,7 +862,6 @@ void init()
 }
 
 
-
 // based on http://www.willusher.io/sdl2%20tutorials/2013/08/17/lesson-1-hello-world/
 int main( int argc, char* args[] )
 {
@@ -877,15 +890,3 @@ int main( int argc, char* args[] )
 	cleanExit(0);
 	return 0;
 }
-
-////Draw Sprites in sprite list
-//for (auto const& spriteKv : spriteList) //unique_ptr can't be copied, so use reference
-//{
-//	//sprite &thisSprite = spriteKv.second
-//	//std::cout << spriteKv.second->Lrectangle.x << std::endl;;
-//	//SDL_RenderCopy(ren, tex, &spriteKv.second->Lrectangle, &spriteKv.second->rectangle);
-//	//SDL_RenderCopy(ren, tex, &currentClip, &spriteKv.second->rectangle);
-//	//spriteList["Pacman_Whole"]->rectangle.x
-
-//}
-////spriteList["Pacman_Whole"]->rectangle

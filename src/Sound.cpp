@@ -13,6 +13,15 @@ Mix_Chunk* Sound::LoadSFX(char* File)
 	return SFX;
 }
 
+bool Sound::PlaySound(Mix_Chunk *SFX, int channel)
+{
+	if (!Mix_Playing(channel))
+	{
+		Mix_PlayChannel(channel, SFX, 0);
+	}
+	return true;
+}
+
 Mix_Music* Sound::LoadMusic (char* File)
 {
 	Mix_Music *Music = nullptr;
