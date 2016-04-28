@@ -101,9 +101,9 @@ int PlayerScore = 0, HighScore = 0, Temp = 0, Lives = 3, Level = 1, Pellets = 24
 int const Start_X = 325, Start_Y = 620;
 int const Start_X2 = 325, Start_Y2 = 187;
 
-int const PINK_X = 290, PINK_Y = 400;
-int const ORANGE_X = 330, ORANGE_Y = 400;
-int const CYAN_X = 380, CYAN_Y = 400;
+int const PINK_X = 25, PINK_Y = 765;
+int const CYAN_X = 145, CYAN_Y = 690;
+int const ORANGE_X = 510, ORANGE_Y = 690;
 
 const int RedGhost_x = 1758;
 const int OrangeGhost_x = 1635;
@@ -124,7 +124,7 @@ int ScreenSize_X = 700, ScreenSize_Y = 875, GameTimer = 0;
 //flags to be used
 bool done = false, loaded = false, Menu = true, Pause = false, Game = false, Fullscreen = false, OpeningSong = false, Levelwin = false, Reset = false, Music = false, BigPellet = false, Dead = false;
 bool tmp = true, Died = false, ScoreMSG1 = false, ScoreMSG2 = false, ScoreMSG3 = false, ScoreMSG4 = false, PowerUp = false, Win = false, Menu_Left = true, Menu_Right = false;
-bool PlayerColide = false;
+bool PlayerColide = false, Ghosts_can_Move = false;
 //The music that will be played
 Mix_Music *gMusic = nullptr;
 
@@ -139,6 +139,11 @@ Mix_Chunk *SFX_BigPellet = nullptr;
 Mix_Chunk *SFX_PowerUp = nullptr;
 
 
+bool Ghost_Direction_Up[3] = { false,false,false };
+bool Ghost_Direction_Down[3] = { false,false,false };
+bool Ghost_Direction_Left[3] = { false,false,false };
+bool Ghost_Direction_Right[3] = { false,false,false };
+
 bool W, A, S, D, UP, DOWN, LEFT, RIGHT, Ghost_UP,Ghost_DOWN,Ghost_LEFT,Ghost_RIGHT = false;
 
 //callback function 
@@ -146,70 +151,15 @@ Uint32 callback( Uint32 interval, void* param);
 void Death();
 void SetPositions();
 void cleanExit(int returnValue);
+void moveGhosts();
 
-Uint32 callback(Uint32 interval, void* param)
-{
-	if ((char*)param == "BigPellet")
-	{
-		BigPellet = false;
-	}
-	if ((char*)param == "MenuLeft")
-	{
-		Menu_Right = true;
-		Menu_Left = false;
-	}
-	if ((char*)param == "MenuRight")
-	{
-		Menu_Right = false;
-		Menu_Left = true;
-	}
-	if ((char*)param == "Win")
-	{
-		Win = false;
-	}
-	if ((char*)param == "EATPlayer2")
-	{
-		Player2.x = Start_X2;	Player2.y = Start_Y2; GhostAnimation[0].x = RedGhost_x; GhostAnimation[0].y = 0;
-		ScoreMSG1 = false;
-	}
-	if ((char*)param == "EATGhost1")
-	{
-		GhostMove[0].x = PINK_X;	GhostMove[0].y = PINK_Y; GhostAnimation[2].x = PinkGhost_x; GhostAnimation[0].y = 0;
-		ScoreMSG2 = false;
-	}
-	if ((char*)param == "EATGhost2")
-	{
-		GhostMove[1].x = CYAN_X;	GhostMove[1].y = CYAN_Y; GhostAnimation[3].x = CyanGhost_x; GhostAnimation[0].y = 0;
-		ScoreMSG3 = false;
-	}
-	if ((char*)param == "EATGhost3")
-	{
-		GhostMove[2].x = ORANGE_X;	GhostMove[2].y = ORANGE_Y; GhostAnimation[4].x = OrangeGhost_x; GhostAnimation[0].y = 0;
-		ScoreMSG4 = false;
-	}
-	if ((char*)param == "Dead")
-	{
-		Dead = false;
-		Death();
-		if (Lives <= 0)
-		{
-			Game = false;
-			Menu = true;
-			Sound::SetVolume(Volume = 0);
-		}
-	}
-	
-	//Print callback message 
-	//printf( "Callback called back with message: %s\n", (char*)param );
-	return 0; 
-}
 void SetPositions()
 {
 	Player.x = Start_X;	Player.y = Start_Y;
 
-	GhostMove[0].x = 290; GhostMove[0].y = 400; GhostMove[0].w = 40; GhostMove[0].h = 40;
-	GhostMove[1].x = 330; GhostMove[1].y = 400; GhostMove[1].w = 40; GhostMove[1].h = 40;
-	GhostMove[2].x = 370; GhostMove[2].y = 400; GhostMove[2].w = 40; GhostMove[2].h = 40;
+	GhostMove[0].x = PINK_X; GhostMove[0].y = PINK_Y; GhostMove[0].w = 40; GhostMove[0].h = 40;
+	GhostMove[1].x = CYAN_X; GhostMove[1].y = CYAN_Y; GhostMove[1].w = 40; GhostMove[1].h = 40;
+	GhostMove[2].x = ORANGE_X; GhostMove[2].y = ORANGE_Y; GhostMove[2].w = 40; GhostMove[2].h = 40;
 
 	GhostAnimation[0].x = RedGhost_x;
 	GhostAnimation[1].x = PinkGhost_x;
@@ -232,6 +182,8 @@ void StartGame()
 	Level = 1; 
 	Lives = 3;
 	tmp = true;
+	BigPellet = false;
+	PowerUp = false;
 	
 	Sound::SetVolume(Volume = 128);
 
@@ -280,7 +232,6 @@ void handleInput()
 				StartGame();
 				//Set game flag for render and simulation
 				Game = true;
-
 				//Play the music for game
 				Mix_PlayMusic(gMusic, -1);
 				
@@ -318,6 +269,9 @@ void handleInput()
 								Pause = false;
 								Sound::PauseMusic(gMusic, Volume);
 								SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO, "Pause = false");
+								Ghost_Direction_Right[0] = true;
+								Ghost_Direction_Up[1] = true;
+								Ghost_Direction_Up[2] = true;
 							}
 						}
 						if (Menu == true)	{done = true;}
@@ -411,7 +365,6 @@ void handleInput()
 					case SDLK_7:
 						//Mute Music
 						Sound::SetVolume(0);
-						BigPellet = true;//------------------------------------------------------------
 						break;
 					case SDLK_8:
 						//Decrease Volume
@@ -499,6 +452,10 @@ void collisions()
 			{
 				ScoreMSG1 = true;
 				Ghost_DOWN = false; Ghost_UP = false; Ghost_RIGHT = false; Ghost_LEFT = false;
+				Ghost_Direction_Up[0] = false;		Ghost_Direction_Up[1] = false;		Ghost_Direction_Up[2] = false;
+				Ghost_Direction_Down[0] = false;	Ghost_Direction_Down[1] = false;	Ghost_Direction_Down[2] = false;
+				Ghost_Direction_Left[0] = false;	Ghost_Direction_Left[1] = false;	Ghost_Direction_Left[2] = false;
+				Ghost_Direction_Right[0] = false;	Ghost_Direction_Right[1] = false;	Ghost_Direction_Right[2] = false;
 				Sound::PlaySound(SFX_EatingGhost, 6);
 				//Set callback
 				SDL_TimerID timerID = SDL_AddTimer(3 * 1000, callback, "EATPlayer2");
@@ -565,34 +522,11 @@ void collisions()
 	case PacmanGridStates::Teleport_2:
 		Player.x = 25;
 		break;
-	case PacmanGridStates::EMPTY:
-		break;
-	case PacmanGridStates::GATE:
-		break;
 	case PacmanGridStates::WALL:
-		if (LEFT == true)
-		{
-			LEFT = false;
-			Player.x += WallOffset;
-		}
-		if (RIGHT == true)
-		{
-			RIGHT = false;
-			Player.x -= WallOffset;
-		}
-		if (UP == true)
-		{
-			UP = false;
-			Player.y += WallOffset;
-		}
-		if (DOWN == true)
-		{
-			DOWN = false;
-			Player.y -= WallOffset;
-		}
-		break;
-
-	default:
+		if (LEFT == true){LEFT = false;Player.x += WallOffset;}
+		if (RIGHT == true){	RIGHT = false;Player.x -= WallOffset;}
+		if (UP == true)	{UP = false;Player.y += WallOffset;	}
+		if (DOWN == true){DOWN = false;	Player.y -= WallOffset;}
 		break;
 	
 	}
@@ -604,31 +538,11 @@ void collisions()
 	case PacmanGridStates::Teleport_2:
 		Player2.x = 25;
 		break;
-	case PacmanGridStates::EMPTY:
-		break;
-	case PacmanGridStates::GATE:
-		break;
 	case PacmanGridStates::WALL:
-		if (Ghost_LEFT == true)
-		{
-			Ghost_LEFT = false;
-			Player2.x += WallOffset;
-		}
-		if (Ghost_RIGHT == true)
-		{
-			Ghost_RIGHT = false;
-			Player2.x -= WallOffset;
-		}
-		if (Ghost_UP == true)
-		{
-			Ghost_UP = false;
-			Player2.y += WallOffset;
-		}
-		if (Ghost_DOWN == true)
-		{
-			Ghost_DOWN = false;
-			Player2.y -= WallOffset - 7;
-		}
+		if (Ghost_LEFT == true)	{Ghost_LEFT = false;Player2.x += WallOffset;}
+		if (Ghost_RIGHT == true){Ghost_RIGHT = false;Player2.x -= WallOffset;}
+		if (Ghost_UP == true){	Ghost_UP = false;	Player2.y += WallOffset;}
+		if (Ghost_DOWN == true)	{	Ghost_DOWN = false;	Player2.y -= WallOffset - 7;}
 		break;
 
 	default:
@@ -637,8 +551,20 @@ void collisions()
 	}
 
 }
+void moveGhosts()
+{
+	if (Ghosts_can_Move == true)
+	{
+		if (GhostMove[0].x <= 26) { Ghost_Direction_Right[0] = true; Ghost_Direction_Left[0] = false; }
+		if (GhostMove[0].x >= 629) { Ghost_Direction_Right[0] = false; Ghost_Direction_Left[0] = true; }
 
+		if (GhostMove[1].y <= 100) { Ghost_Direction_Down[1] = true; Ghost_Direction_Up[1] = false; }
+		if (GhostMove[1].y >= 690) { Ghost_Direction_Down[1] = false; Ghost_Direction_Up[1] = true; }
 
+		if (GhostMove[2].y <= 100) { Ghost_Direction_Down[2] = true; Ghost_Direction_Up[2] = false; }
+		if (GhostMove[2].y >= 690) { Ghost_Direction_Down[2] = false; Ghost_Direction_Up[2] = true; }
+	}
+}
 // tag::updateSimulation[]
 void updateSimulation(double simLength = 0.02) //update simulation with an amount of time to simulate for (in seconds)
 {
@@ -650,73 +576,68 @@ void updateSimulation(double simLength = 0.02) //update simulation with an amoun
 		Reset = false;
 	}
 	//Pause Menu ON
-	if (Pause == true)
-	{
+	if (Pause == true){
 		//Freeze Movement
 		UP = false; DOWN = false; LEFT = false; RIGHT = false;
 		Ghost_UP = false; Ghost_DOWN = false; Ghost_RIGHT = false; Ghost_LEFT = false;
+		Ghost_Direction_Up[0] = false;		Ghost_Direction_Up[1] = false;		Ghost_Direction_Up[2] = false;
+		Ghost_Direction_Down[0] = false;	Ghost_Direction_Down[1] = false;	Ghost_Direction_Down[2] = false;
+		Ghost_Direction_Left[0] = false;	Ghost_Direction_Left[1] = false;	Ghost_Direction_Left[2] = false;
+		Ghost_Direction_Right[0] = false;	Ghost_Direction_Right[1] = false;	Ghost_Direction_Right[2] = false;
+	}
+	if (Pause == false && Ghosts_can_Move == true)
+	{
+		moveGhosts();
 	}
 	//Movement------------------------------------------------
-	if (Game == true && UP == true)
-	{
-		Player.y -= PlayerSpeed;
-		Animation.x = 1515;Animation.y = 158;	
+	//Player 1
+	if (Game == true && UP == true)	{Player.y -= PlayerSpeed;Animation.x = 1515;Animation.y = 158;}
+	if (Game == true && DOWN == true){Player.y += PlayerSpeed;	Animation.x = (1515 + 38);Animation.y = 158;}
+	if (Game == true && RIGHT == true){	Player.x += PlayerSpeed;Animation.x = (1515 + 38);Animation.y = 0;	}
+	if (Game == true && LEFT == true){Player.x -= PlayerSpeed;	Animation.x = 1515; Animation.y = 0;}
+
+	//Player 2
+	if (Game == true && Ghost_UP == true) {	Player2.y -= PlayerSpeed;
+		if (BigPellet == false)	{	GhostAnimation[0].y = 242;}
 	}
-	if (Game == true && DOWN == true)
-	{
-		Player.y += PlayerSpeed;
-		Animation.x = (1515 + 38);Animation.y = 158;
+	if (Game == true && Ghost_DOWN == true)	{	Player2.y += PlayerSpeed;
+		if (BigPellet == false)	{	GhostAnimation[0].y = 79;}	
 	}
-	if (Game == true && RIGHT == true)
-	{
-		Player.x += PlayerSpeed;
-		Animation.x = (1515 + 38);Animation.y = 0;
+	if (Game == true && Ghost_RIGHT == true){Player2.x += PlayerSpeed;
+		if (BigPellet == false)	{	GhostAnimation[0].y = 0;}
 	}
-	if (Game == true && LEFT == true)
-	{
-		Player.x -= PlayerSpeed;
-		Animation.x = 1515; Animation.y = 0;
+	if (Game == true && Ghost_LEFT == true)	{Player2.x -= PlayerSpeed;
+		if (BigPellet == false)	{GhostAnimation[0].y = 165;	}
 	}
 
+	//Ghosts
+	//up
+	if (Game == true && Ghost_Direction_Up[0] == true) { GhostMove[0].y -= PlayerSpeed; GhostAnimation[1].y = 242; }
+	if (Game == true && Ghost_Direction_Up[1] == true) { GhostMove[1].y -= PlayerSpeed; GhostAnimation[2].y = 242; }
+	if (Game == true && Ghost_Direction_Up[2] == true) { GhostMove[2].y -= PlayerSpeed; GhostAnimation[3].y = 242; }
+	//Down
+	if (Game == true && Ghost_Direction_Down[0] == true) { GhostMove[0].y += PlayerSpeed;	GhostAnimation[1].y = 79;}
+	if (Game == true && Ghost_Direction_Down[1] == true) { GhostMove[1].y += PlayerSpeed;	GhostAnimation[2].y = 79;}
+	if (Game == true && Ghost_Direction_Down[2] == true) { GhostMove[2].y += PlayerSpeed;	GhostAnimation[3].y = 79;}
+	//Left
+	if (Game == true && Ghost_Direction_Left[0] == true) { GhostMove[0].x -= PlayerSpeed; GhostAnimation[1].y = 165;}
+	if (Game == true && Ghost_Direction_Left[1] == true) { GhostMove[1].x -= PlayerSpeed; GhostAnimation[2].y = 165;}
+	if (Game == true && Ghost_Direction_Left[2] == true) { GhostMove[2].x -= PlayerSpeed; GhostAnimation[3].y = 165;}
+	//Right
+	if (Game == true && Ghost_Direction_Right[0] == true ) { GhostMove[0].x += PlayerSpeed; GhostAnimation[1].y = 0;	}
+	if (Game == true && Ghost_Direction_Right[1] == true ) { GhostMove[1].x += PlayerSpeed; GhostAnimation[2].y = 0;	}
+	if (Game == true && Ghost_Direction_Right[2] == true ) { GhostMove[2].x += PlayerSpeed; GhostAnimation[3].y = 0;	}
 
-	if (Game == true && Ghost_UP == true)
-	{
-		Player2.y -= PlayerSpeed;
-		if (BigPellet == false)
-		{
-			GhostAnimation[0].y = 242;
-		}
-	}
-	if (Game == true && Ghost_DOWN == true)
-	{
-		Player2.y += PlayerSpeed;
-		if (BigPellet == false)
-		{
-			GhostAnimation[0].y = 79;
-		}	
-	}
-	if (Game == true && Ghost_RIGHT == true)
-	{
-		Player2.x += PlayerSpeed;
-		if (BigPellet == false)
-		{
-			GhostAnimation[0].y = 0;
-		}
-	}
-	if (Game == true && Ghost_LEFT == true)
-	{
-		Player2.x -= PlayerSpeed;
-		if (BigPellet == false)
-		{
-			GhostAnimation[0].y = 165;
-		}
-	}
-
-
+	moveGhosts();
+	
+	
 	if (Game == true && BigPellet == true)
 	{
 		GhostAnimation[0].x = 1266; GhostAnimation[1].x = 1266; GhostAnimation[2].x = 1266; GhostAnimation[3].x = 1266;
 		GhostAnimation[0].y = 0;
+		GhostAnimation[1].y = 0;
+		GhostAnimation[2].y = 0;
+		GhostAnimation[3].y = 0;
 		//Mix_PlayChannel(-1, SFX_EatingGhost, );
 		Sound::PlaySound(SFX_BigPellet, 2);	
 
@@ -834,6 +755,7 @@ void render()
 			{
 				Music = true;
 			}
+			if (GameTimer == 250) { Ghosts_can_Move = true; }
 			if (GameTimer == 750)  { PowerUp = true;}
 			if (GameTimer == 1250) { PowerUp = false;}
 			if (GameTimer == 1750) { PowerUp = true;}
@@ -894,7 +816,7 @@ void render()
 			//Ghosts
 			if (ScoreMSG2 == false){Sprite::Draw(ren, tex, GhostAnimation[1].x, GhostAnimation[1].y + (Ghost * 40), 40, 40, GhostMove[0].x, GhostMove[0].y, GhostMove[0].w, GhostMove[0].w);}
 			if (ScoreMSG3 == false){Sprite::Draw(ren, tex, GhostAnimation[2].x, GhostAnimation[2].y + (Ghost * 40), 40, 40, GhostMove[1].x, GhostMove[1].y, GhostMove[1].w, GhostMove[1].w);}
-			if (ScoreMSG4 == false){Sprite::Draw(ren, tex, GhostAnimation[3].x, GhostAnimation[2].y + (Ghost * 40), 40, 40, GhostMove[2].x, GhostMove[2].y, GhostMove[2].w, GhostMove[2].w);}
+			if (ScoreMSG4 == false){Sprite::Draw(ren, tex, GhostAnimation[3].x, GhostAnimation[3].y + (Ghost * 40), 40, 40, GhostMove[2].x, GhostMove[2].y, GhostMove[2].w, GhostMove[2].w);}
 			//Sprite::Draw(ren, tex, GhostAnimation[3].x, GhostAnimation[3].y + (Ghost * 40), 40, 40, 380, 400, 40, 40);
 			
 			if (ScoreMSG1 == true){	Sprite::Draw(ren, tex, 1655,332 , 40, 40, Player2.x, Player2.y,50 ,50);	GhostAnimation[0].y = 0; GhostAnimation[0].x = 1200;}
@@ -972,7 +894,7 @@ void render()
 			
 			if (Menu_Left == true)
 			{
-				SDL_TimerID timerID = SDL_AddTimer(8 * 1000, callback, "MenuLeft");
+				SDL_TimerID timerID = SDL_AddTimer(10 * 1000, callback, "MenuLeft");
 
 				Sprite::Draw(ren, tex, 1758, 165+(Ghost * 40), 40, 40, Menu_Move[0] , 580, 40, 40);
 				Sprite::Draw(ren, tex, 1675, 165+(Ghost * 40), 40, 40, Menu_Move[1] , 580, 40, 40);
@@ -991,8 +913,6 @@ void render()
 				Sprite::Draw(ren, tex, 1555, 0 + (Pacman * 40), 38, 38, Menu_Move[4], 580, 40, 40);
 			}
 			
-			
-
 			//Drawing Dots 
 			Sprite::Draw(ren, tex, 26, 47, 12, 12, 283, 658, 12, 12);
 			Sprite::Draw(ren, tex, 18, 61, 25, 25, 275, 700, 25, 25);
@@ -1195,6 +1115,27 @@ void init()
 	}
 }
 
+Uint32 callback(Uint32 interval, void* param)
+{
+	if ((char*)param == "BigPellet"){BigPellet = false;}
+
+	if ((char*)param == "MenuLeft"){Menu_Right = true;Menu_Left = false;}
+
+	if ((char*)param == "MenuRight"){Menu_Right = false;Menu_Left = true;}
+
+	if ((char*)param == "Win") { Win = false; }
+
+	if ((char*)param == "EATPlayer2"){	Player2.x = Start_X2;	Player2.y = Start_Y2; GhostAnimation[0].x = RedGhost_x; GhostAnimation[0].y = 0;ScoreMSG1 = false;}
+
+	if ((char*)param == "EATGhost1"){	GhostMove[0].x = PINK_X;	GhostMove[0].y = PINK_Y; GhostAnimation[2].x = PinkGhost_x; GhostAnimation[0].y = 0;ScoreMSG2 = false;	}
+
+	if ((char*)param == "EATGhost2"){	GhostMove[1].x = CYAN_X;	GhostMove[1].y = CYAN_Y; GhostAnimation[3].x = CyanGhost_x; GhostAnimation[0].y = 0;ScoreMSG3 = false;	}
+
+	if ((char*)param == "EATGhost3"){	GhostMove[2].x = ORANGE_X;	GhostMove[2].y = ORANGE_Y; GhostAnimation[4].x = OrangeGhost_x; GhostAnimation[0].y = 0;ScoreMSG4 = false;	}
+
+	if ((char*)param == "Dead")	{	Dead = false;	Death();if (Lives <= 0)	{Game = false;	Menu = true;Sound::SetVolume(Volume = 0);}}
+	return 0;
+}
 
 // based on http://www.willusher.io/sdl2%20tutorials/2013/08/17/lesson-1-hello-world/
 int main( int argc, char* args[] )
