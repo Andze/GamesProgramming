@@ -96,7 +96,7 @@ PacmanGridStates Map[Map_Rows][Map_Collums] = {
 //Current animation frame 
 int frame = 0;
 
-int PlayerScore = 0, HighScore = 0, Temp = 0, Lives = 3, Level = 1, Pellets = 244, Volume = 128;
+int PlayerScore = 0, HighScore = 0, Temp = 0, Lives = 3, Level = 1, Pellets = 244, Volume = 128, GhostsEaten = 0;
 
 int const Start_X = 325, Start_Y = 620;
 int const Start_X2 = 325, Start_Y2 = 187;
@@ -118,7 +118,7 @@ int ScreenSize_X = 700, ScreenSize_Y = 875, GameTimer = 0;
 
 //flags to be used
 bool done = false, loaded = false, Menu = true, Pause = false, Game = false, Fullscreen = false, OpeningSong = false, Levelwin = false, Reset = false, Music = false, BigPellet = false, Dead = false;
-bool tmp = true, Died = false;
+bool tmp = true, Died = false, ScoreMSG = false;
 bool PlayerColide = false;
 //The music that will be played
 Mix_Music *gMusic = nullptr;
@@ -138,12 +138,18 @@ bool W, A, S, D, UP, DOWN, LEFT, RIGHT, Ghost_UP,Ghost_DOWN,Ghost_LEFT,Ghost_RIG
 Uint32 callback( Uint32 interval, void* param);
 void Death();
 void SetPositions();
+void cleanExit(int returnValue);
 
 Uint32 callback(Uint32 interval, void* param)
 { 
 	if ((char*)param == "BigPellet")
 	{
 		BigPellet = false;
+	}
+	if ((char*)param == "EATPlayer2")
+	{
+		Player2.x = Start_X2;	Player2.y = Start_Y2; GhostAnimation[0].x = RedGhost_x; GhostAnimation[0].y = 0;
+		ScoreMSG = false;
 	}
 	if ((char*)param == "Dead")
 	{
@@ -156,6 +162,7 @@ Uint32 callback(Uint32 interval, void* param)
 			Sound::SetVolume(Volume = 0);
 		}
 	}
+	
 	//Print callback message 
 	//printf( "Callback called back with message: %s\n", (char*)param );
 	return 0; 
@@ -441,11 +448,23 @@ void collisions()
 	//PlayerColide = Collision::RectCD( &Player, &Player2);
 	if (Dead != true)
 	{
-		if (Collision::RectCD(&Player, &Player2) || Collision::RectCD(&Player, &GhostMove[1]) || Collision::RectCD(&Player, &GhostMove[2]) || Collision::RectCD(&Player, &GhostMove[3]))
+		if (BigPellet == false)
 		{
-		printf("Collide");
-		Dead = true; Died = true;
+			if (Collision::RectCD(&Player, &Player2) || Collision::RectCD(&Player, &GhostMove[1]) || Collision::RectCD(&Player, &GhostMove[2]) || Collision::RectCD(&Player, &GhostMove[3]))
+			{
+			Dead = true; Died = true;
+			}
 		}
+		if (BigPellet == true)
+		{
+			if (Collision::RectCD(&Player, &Player2))
+			{
+				ScoreMSG = true;
+				Ghost_DOWN = false; Ghost_UP = false; Ghost_RIGHT = false; Ghost_LEFT = false;
+				//Set callback
+				SDL_TimerID timerID = SDL_AddTimer(3 * 1000, callback, "EATPlayer2");
+			}
+		}		
 	}
 	
 	int gridX = gridFromPixelX(Player.x + GridCentre); //tODO softcode and check
@@ -642,7 +661,7 @@ void updateSimulation(double simLength = 0.02) //update simulation with an amoun
 		Sound::PlaySound(SFX_BigPellet, 2);	
 
 		//Set callback
-		SDL_TimerID timerID = SDL_AddTimer(3 * 1000, callback, "BigPellet");
+		SDL_TimerID timerID = SDL_AddTimer(6 * 1000, callback, "BigPellet");
 	}
 	if (Game == true && BigPellet == false)
 	{
@@ -657,13 +676,15 @@ void updateSimulation(double simLength = 0.02) //update simulation with an amoun
 		//Timer------------- 
 		LEFT = false;UP = false;RIGHT = false;DOWN = false;
 		//play animation--------------
+
 		//reset everything
-		Player.x = Start_X, Player.y = Start_Y;
-		//ghost position
 		//Reset Level
 		Reset = true;
 		//Incriment Level
 		Level++;
+		//ghost position
+		SetPositions();
+		
 	}
 	if (Dead == true)
 	{
@@ -696,44 +717,6 @@ void updateSimulation(double simLength = 0.02) //update simulation with an amoun
 
 
 }
-
-void cleanExit(int returnValue)
-{
-	Score::SaveHighScore("./assets/Score/Score.txt", PlayerScore, HighScore);
-
-	if (messageTexture != nullptr) SDL_DestroyTexture(messageTexture[0]);
-	if (tex != nullptr) SDL_DestroyTexture(tex);
-	if (ren != nullptr) SDL_DestroyRenderer(ren);
-	if (win != nullptr) SDL_DestroyWindow(win);
-
-	//Quit SDL_ttf
-	TTF_Quit();
-
-	//Free the sound effects
-	Mix_FreeChunk(SFX_OpeningSong);
-	Mix_FreeChunk(SFX_WakaWaka);
-	Mix_FreeChunk(SFX_Dies);
-	Mix_FreeChunk(SFX_Cherry);
-	Mix_FreeChunk(SFX_EatingGhost);
-	Mix_FreeChunk(SFX_ExtraLife);
-
-	//Set the variables back to empty
-	SFX_OpeningSong = NULL;
-	SFX_WakaWaka = NULL;
-	SFX_Dies = NULL;
-	SFX_Cherry = NULL;
-	SFX_EatingGhost = NULL;
-	SFX_ExtraLife = NULL;
-
-	//Free the music
-	Mix_FreeMusic(gMusic);
-	gMusic = NULL;
-
-	SDL_Quit();
-	exit(returnValue);
-}
-
-
 
 void render()
 {
@@ -822,6 +805,11 @@ void render()
 			Sprite::Draw(ren, tex, GhostAnimation[3].x, GhostAnimation[2].y +( Ghost * 40), 40, 40, GhostMove[2].x, GhostMove[2].y, GhostMove[2].w, GhostMove[2].w);
 			//Sprite::Draw(ren, tex, GhostAnimation[3].x, GhostAnimation[3].y + (Ghost * 40), 40, 40, 380, 400, 40, 40);
 
+			if (ScoreMSG == true)
+			{
+				Sprite::Draw(ren, tex, 1655,332 , 40, 40, Player2.x, Player2.y,50 ,50);
+				GhostAnimation[0].y = 0; GhostAnimation[0].x = 1200;
+			}
 			if (Dead == true)
 			{			
 				Sprite::Draw(ren, tex, 1472, 0 + (Death * 40), 38, 38, Player.x, Player.y, Player.w, Player.h);
@@ -1009,7 +997,41 @@ void LoadSound()
 	SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO, "Sounds added");
 }
 
+void cleanExit(int returnValue)
+{
+	Score::SaveHighScore("./assets/Score/Score.txt", PlayerScore, HighScore);
 
+	if (messageTexture != nullptr) SDL_DestroyTexture(messageTexture[0]);
+	if (tex != nullptr) SDL_DestroyTexture(tex);
+	if (ren != nullptr) SDL_DestroyRenderer(ren);
+	if (win != nullptr) SDL_DestroyWindow(win);
+
+	//Quit SDL_ttf
+	TTF_Quit();
+
+	//Free the sound effects
+	Mix_FreeChunk(SFX_OpeningSong);
+	Mix_FreeChunk(SFX_WakaWaka);
+	Mix_FreeChunk(SFX_Dies);
+	Mix_FreeChunk(SFX_Cherry);
+	Mix_FreeChunk(SFX_EatingGhost);
+	Mix_FreeChunk(SFX_ExtraLife);
+
+	//Set the variables back to empty
+	SFX_OpeningSong = NULL;
+	SFX_WakaWaka = NULL;
+	SFX_Dies = NULL;
+	SFX_Cherry = NULL;
+	SFX_EatingGhost = NULL;
+	SFX_ExtraLife = NULL;
+
+	//Free the music
+	Mix_FreeMusic(gMusic);
+	gMusic = NULL;
+
+	SDL_Quit();
+	exit(returnValue);
+}
 
 void init()
 {
