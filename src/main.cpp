@@ -1,12 +1,5 @@
 
 #include "common.h"
-#include "Sprite.h"
-#include "Text.h"
-#include "Sound.h"
-#include "Score.h"
-#include "Button.h"
-
-
 
 #ifdef _WIN32 // compiling on windows
 #include <SDL.h>
@@ -26,8 +19,10 @@ using namespace std;
 std::string Pacman;
 //Window
 SDL_Window *win; //pointer to the SDL_Window
+SDL_Window *win2; //pointer to the SDL_Window
 //Render
 SDL_Renderer *ren; //pointer to the SDL_Renderer
+SDL_Renderer *ren2; //pointer to the SDL_Renderer
 //Image Texture
 SDL_Texture *tex; //pointer to the SDL_Texture
 SDL_Texture *tex1; //pointer to the SDL_Texture
@@ -35,7 +30,7 @@ SDL_Texture *tex1; //pointer to the SDL_Texture
 SDL_Event event;
 
 //Text
-SDL_Texture *messageTexture[4]; //pointer to the SDL_Texture for message
+SDL_Texture *messageTexture[5]; //pointer to the SDL_Texture for message
 
 SDL_Texture *PauseTexture[3]; //pointer to the SDL_Texture for pause menu
 
@@ -50,13 +45,18 @@ TTF_Font *font = nullptr;
 
 //Player
 SDL_Rect Player;
+SDL_Rect Player2;
+
+SDL_Rect GhostMove[3];
+
 SDL_Rect Animation;
+SDL_Rect GhostAnimation[3];
 
 //31 x 28
 int const Map_Rows = 31 , Map_Collums = 28;
 
 // enum class
-enum class PacmanGridStates { EMPTY = 2, WALL = 0, PELLET = 1, BIG_PELLET = 3, GATE = 4, EATEN = 5, EATEN_BIG = 6};
+enum class PacmanGridStates { EMPTY = 2, WALL = 0, PELLET = 1, BIG_PELLET = 3, GATE = 4, EATEN = 5, EATEN_BIG = 6, Teleport_1, Teleport_2};
 
 PacmanGridStates Map[Map_Rows][Map_Collums] = {
 	{ PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL } ,
@@ -74,7 +74,7 @@ PacmanGridStates Map[Map_Rows][Map_Collums] = {
 	//Centre Teleporter Line 
 	{ PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::EMPTY, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::GATE, PacmanGridStates::GATE, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::EMPTY, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL },
 	{ PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::EMPTY, PacmanGridStates::WALL, PacmanGridStates::EMPTY, PacmanGridStates::EMPTY, PacmanGridStates::EMPTY, PacmanGridStates::EMPTY, PacmanGridStates::EMPTY, PacmanGridStates::EMPTY, PacmanGridStates::WALL, PacmanGridStates::EMPTY, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL },
-	{ PacmanGridStates::EMPTY, PacmanGridStates::EMPTY, PacmanGridStates::EMPTY, PacmanGridStates::EMPTY, PacmanGridStates::EMPTY, PacmanGridStates::EMPTY, PacmanGridStates::PELLET, PacmanGridStates::EMPTY, PacmanGridStates::EMPTY, PacmanGridStates::EMPTY, PacmanGridStates::WALL, PacmanGridStates::EMPTY, PacmanGridStates::EMPTY, PacmanGridStates::EMPTY, PacmanGridStates::EMPTY, PacmanGridStates::EMPTY, PacmanGridStates::EMPTY, PacmanGridStates::WALL, PacmanGridStates::EMPTY, PacmanGridStates::EMPTY, PacmanGridStates::EMPTY, PacmanGridStates::PELLET, PacmanGridStates::EMPTY, PacmanGridStates::EMPTY, PacmanGridStates::EMPTY, PacmanGridStates::EMPTY, PacmanGridStates::EMPTY, PacmanGridStates::EMPTY },
+	{ PacmanGridStates::Teleport_1, PacmanGridStates::EMPTY, PacmanGridStates::EMPTY, PacmanGridStates::EMPTY, PacmanGridStates::EMPTY, PacmanGridStates::EMPTY, PacmanGridStates::PELLET, PacmanGridStates::EMPTY, PacmanGridStates::EMPTY, PacmanGridStates::EMPTY, PacmanGridStates::WALL, PacmanGridStates::EMPTY, PacmanGridStates::EMPTY, PacmanGridStates::EMPTY, PacmanGridStates::EMPTY, PacmanGridStates::EMPTY, PacmanGridStates::EMPTY, PacmanGridStates::WALL, PacmanGridStates::EMPTY, PacmanGridStates::EMPTY, PacmanGridStates::EMPTY, PacmanGridStates::PELLET, PacmanGridStates::EMPTY, PacmanGridStates::EMPTY, PacmanGridStates::EMPTY, PacmanGridStates::EMPTY, PacmanGridStates::EMPTY, PacmanGridStates::Teleport_2 },
 	{ PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::EMPTY, PacmanGridStates::WALL, PacmanGridStates::EMPTY, PacmanGridStates::EMPTY, PacmanGridStates::EMPTY, PacmanGridStates::EMPTY, PacmanGridStates::EMPTY, PacmanGridStates::EMPTY, PacmanGridStates::WALL, PacmanGridStates::EMPTY, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL },
 	{ PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::EMPTY, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::EMPTY, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL },
 	{ PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::EMPTY, PacmanGridStates::EMPTY, PacmanGridStates::EMPTY, PacmanGridStates::EMPTY, PacmanGridStates::EMPTY, PacmanGridStates::EMPTY, PacmanGridStates::EMPTY, PacmanGridStates::EMPTY, PacmanGridStates::EMPTY, PacmanGridStates::EMPTY, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::PELLET, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL, PacmanGridStates::WALL },
@@ -96,14 +96,30 @@ PacmanGridStates Map[Map_Rows][Map_Collums] = {
 //Current animation frame 
 int frame = 0;
 
-int PlayerScore = 0, HighScore = 0, Temp = 0, Lives = 3, Level = 1, Pellets = 244;
+int PlayerScore = 0, HighScore = 0, Temp = 0, Lives = 3, Level = 1, Pellets = 244, Volume = 128;
+
 int const Start_X = 325, Start_Y = 620;
+int const Start_X2 = 325, Start_Y2 = 187;
+
+const int RedGhost_x = 1758;
+const int OrangeGhost_x = 1635;
+const int PinkGhost_x = 1675;
+const int CyanGhost_x = 1717;
+
+const int PlayerSpeed = 3;
+const int pixelPerGridCell = 24;
+const int pixelOffsetX = 16;
+const int pixelOffsetY = 80;
+const int WallOffset = 10;
+const int BIG_PELLET_Offset = 8;
+const int GridCentre = 25;
+
 int ScreenSize_X = 700, ScreenSize_Y = 875, GameTimer = 0;
+
 //flags to be used
-bool done = false, loaded = false, Menu = true, Pause = false, Game = false, Fullscreen = false, OpeningSong = false, Levelwin = false, Reset = false, Music = false, BigPellet = false;
-
-int Ghost1 = 1758;
-
+bool done = false, loaded = false, Menu = true, Pause = false, Game = false, Fullscreen = false, OpeningSong = false, Levelwin = false, Reset = false, Music = false, BigPellet = false, Dead = false;
+bool tmp = true, Died = false;
+bool PlayerColide = false;
 //The music that will be played
 Mix_Music *gMusic = nullptr;
 
@@ -114,42 +130,71 @@ Mix_Chunk *SFX_Dies = nullptr;
 Mix_Chunk *SFX_Cherry = nullptr;
 Mix_Chunk *SFX_EatingGhost = nullptr;
 Mix_Chunk *SFX_ExtraLife = nullptr;
+Mix_Chunk *SFX_BigPellet = nullptr;
 
-bool W, A, S, D, UP, DOWN, LEFT, RIGHT = false;
+bool W, A, S, D, UP, DOWN, LEFT, RIGHT, Ghost_UP,Ghost_DOWN,Ghost_LEFT,Ghost_RIGHT = false;
 
-void PauseMusic()
+//callback function 
+Uint32 callback( Uint32 interval, void* param);
+void Death();
+void SetPositions();
+
+Uint32 callback(Uint32 interval, void* param)
+{ 
+	if ((char*)param == "BigPellet")
+	{
+		BigPellet = false;
+	}
+	if ((char*)param == "Dead")
+	{
+		Dead = false;
+		Death();
+		if (Lives <= 0)
+		{
+			Game = false;
+			Menu = true;
+			Sound::SetVolume(Volume = 0);
+		}
+	}
+	//Print callback message 
+	//printf( "Callback called back with message: %s\n", (char*)param );
+	return 0; 
+}
+void SetPositions()
 {
-	if (Mix_PlayingMusic() == 0)
-	{
-		//Play the music
-		Mix_PlayMusic(gMusic, -1);
-	}
-	//If music is being played
-	else
-	{
-		//If the music is paused
-		if (Mix_PausedMusic() == 1)
-		{
-			//Resume the music
-			Mix_ResumeMusic();
-		}
-		//If the music is playing
-		else
-		{
-			//Pause the music
-			Mix_PauseMusic();
-		}
-	}
+	Player.x = Start_X;	Player.y = Start_Y;
+
+	GhostMove[0].x = 290; GhostMove[0].y = 400; GhostMove[0].w = 40; GhostMove[0].h = 40;
+	GhostMove[1].x = 330; GhostMove[1].y = 400; GhostMove[1].w = 40; GhostMove[1].h = 40;
+	GhostMove[2].x = 370; GhostMove[2].y = 400; GhostMove[2].w = 40; GhostMove[2].h = 40;
+
+	GhostAnimation[0].x = RedGhost_x;
+	GhostAnimation[1].x = PinkGhost_x;
+	GhostAnimation[2].x = CyanGhost_x;
+	GhostAnimation[3].x = OrangeGhost_x;
+
+	Player2.x = Start_X2;	Player2.y = Start_Y2;
+}
+void Death()
+{
+	tmp = true;
+	//Reset Players postion
+	SetPositions();
 }
 void StartGame()
 {
 	//Reset Score
 	PlayerScore = 0;
 	//Reset Level
-	Level = 1;
-	//Reset Players postion
-	Player.x = Start_X;	Player.y = Start_Y;
+	Level = 1; 
+	Lives = 3;
+	tmp = true;
+	
+	Sound::SetVolume(Volume = 128);
+
+	SetPositions();
 }
+
 void handleInput()
 {
 	//Event-based input handling
@@ -188,7 +233,7 @@ void handleInput()
 			{
 				//Every time play button is pressed Reset the level map pellets
 				Reset = true;
-
+				StartGame();
 				//Set game flag for render and simulation
 				Game = true;
 
@@ -198,8 +243,6 @@ void handleInput()
 				Pause = false;
 			}
 		}				
-	
-
 		switch (event.type)
 		{
 		case SDL_QUIT:
@@ -223,13 +266,13 @@ void handleInput()
 							if (Pause == false)
 							{
 								Pause = true;
-								PauseMusic();
+								Sound::PauseMusic(gMusic, Volume);
 								SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO, "Pause = true");
 							}
 							else
 							{
 								Pause = false;
-								PauseMusic();
+								Sound::PauseMusic(gMusic, Volume);
 								SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO, "Pause = false");
 							}
 						}
@@ -268,6 +311,26 @@ void handleInput()
 						UP = false;	DOWN = false; RIGHT = false;
 						break;
 
+					case SDLK_w:
+						Ghost_UP = true;
+						Ghost_DOWN = false; Ghost_RIGHT = false; Ghost_LEFT = false;
+						break;
+
+					case SDLK_s:
+						Ghost_DOWN = true;
+						Ghost_RIGHT = false; Ghost_LEFT = false; Ghost_UP = false;
+						break;
+
+					case SDLK_d:
+						Ghost_RIGHT = true;
+						Ghost_LEFT = false; Ghost_UP = false; Ghost_DOWN = false;
+						break;
+
+					case SDLK_a:
+						Ghost_LEFT = true;
+						Ghost_UP = false;	Ghost_DOWN = false; Ghost_RIGHT = false;
+						break;
+
 					case SDLK_1:
 						//Set Fullscreen
 						SDL_SetWindowFullscreen(win, SDL_WINDOW_FULLSCREEN);
@@ -280,23 +343,19 @@ void handleInput()
 						SDL_SetWindowFullscreen(win, 0);
 						break;
 
-						//Play low sound effect
 					case SDLK_3:
 						//Mix_PlayChannel(-1, SFX_Dies, 0);
 						//Set original size
 						SDL_SetWindowSize(win, ScreenSize_X, ScreenSize_Y);
 						break;
-
-						//Play scratch sound effect
 					case SDLK_4:
-						//Mix_PlayChannel(-1, SFX_EatingGhost, 0);
+			
 						//Set Resolution
 						SDL_SetWindowSize(win, 1024, 768);
 						break;
 
 						//Add score
 					case SDLK_5:
-						PlayerScore += 10;
 						SDL_SetWindowSize(win, 1280, 720);
 						break;
 
@@ -305,8 +364,21 @@ void handleInput()
 						
 						break;
 						
-
+					case SDLK_7:
+						//Mute Music
+						Sound::SetVolume(0);
+						break;
+					case SDLK_8:
+						//Decrease Volume
+						Sound::SetVolume(Volume -= 10);
+						break;
 					case SDLK_9:
+						//Increase Volume
+						Sound::SetVolume(Volume += 10);
+						break;
+					case SDLK_0:
+						//Set Music to full
+						Sound::SetVolume(Volume = 128);
 						break;
 					
 				}
@@ -333,20 +405,15 @@ void ResetMap()
 			} break;
 
 			case  PacmanGridStates::EATEN_BIG:
-			{
-				Map[Row][collum] = PacmanGridStates::BIG_PELLET;
-			} break;
+				{
+					Map[Row][collum] = PacmanGridStates::BIG_PELLET;
+				} break;
 			}
 		}
 	}
 }
 
-const int PlayerSpeed = 3;
-const int pixelPerGridCell = 24;
-const int pixelOffsetX = 16;
-const int pixelOffsetY = 80;
-const int WallOffset = 10;
-const int BIG_PELLET_Offset = 8;
+
 
 int pixelFromGridX(int GridX)
 {
@@ -370,10 +437,22 @@ int gridFromPixelY(int pixelY)
 
 void collisions()
 {
-	int gridX = gridFromPixelX(Player.x + 25); //tODO softcode and check
-	int gridY = gridFromPixelY(Player.y + 25);
+
+	//PlayerColide = Collision::RectCD( &Player, &Player2);
+	if (Dead != true)
+	{
+		if (Collision::RectCD(&Player, &Player2) || Collision::RectCD(&Player, &GhostMove[1]) || Collision::RectCD(&Player, &GhostMove[2]) || Collision::RectCD(&Player, &GhostMove[3]))
+		{
+		printf("Collide");
+		Dead = true; Died = true;
+		}
+	}
 	
-	//cout << "pacman cell " << gridX << ", " << gridY << std::endl;
+	int gridX = gridFromPixelX(Player.x + GridCentre); //tODO softcode and check
+	int gridY = gridFromPixelY(Player.y + GridCentre);
+
+	int gridX2 = gridFromPixelX(Player2.x + GridCentre); //tODO softcode and check
+	int gridY2 = gridFromPixelY(Player2.y + GridCentre);
 
 	switch (Map[gridY][gridX])
 	{
@@ -389,7 +468,6 @@ void collisions()
 		Pellets--;
 
 		BigPellet = true;
-		Ghost1 = 1266;
 
 		break;
 		
@@ -403,7 +481,13 @@ void collisions()
 		//take 1 away from the pellet count to keep track of the level progression
 		Pellets--;
 		break;
-
+		
+	case PacmanGridStates::Teleport_1:
+		Player.x = 625;
+		break;
+	case PacmanGridStates::Teleport_2:
+		Player.x = 25;
+		break;
 	case PacmanGridStates::EMPTY:
 		break;
 	case PacmanGridStates::GATE:
@@ -435,8 +519,49 @@ void collisions()
 		break;
 	
 	}
+	switch (Map[gridY2][gridX2])
+	{
+	case PacmanGridStates::Teleport_1:
+		Player2.x = 625;
+		break;
+	case PacmanGridStates::Teleport_2:
+		Player2.x = 25;
+		break;
+	case PacmanGridStates::EMPTY:
+		break;
+	case PacmanGridStates::GATE:
+		break;
+	case PacmanGridStates::WALL:
+		if (Ghost_LEFT == true)
+		{
+			Ghost_LEFT = false;
+			Player2.x += WallOffset;
+		}
+		if (Ghost_RIGHT == true)
+		{
+			Ghost_RIGHT = false;
+			Player2.x -= WallOffset;
+		}
+		if (Ghost_UP == true)
+		{
+			Ghost_UP = false;
+			Player2.y += WallOffset;
+		}
+		if (Ghost_DOWN == true)
+		{
+			Ghost_DOWN = false;
+			Player2.y -= WallOffset - 7;
+		}
+		break;
+
+	default:
+		break;
+
+	}
 
 }
+
+
 // tag::updateSimulation[]
 void updateSimulation(double simLength = 0.02) //update simulation with an amount of time to simulate for (in seconds)
 {
@@ -452,33 +577,80 @@ void updateSimulation(double simLength = 0.02) //update simulation with an amoun
 	{
 		//Freeze Movement
 		UP = false; DOWN = false; LEFT = false; RIGHT = false;
+		Ghost_UP = false; Ghost_DOWN = false; Ghost_RIGHT = false; Ghost_LEFT = false;
 	}
 	//Movement------------------------------------------------
 	if (Game == true && UP == true)
 	{
 		Player.y -= PlayerSpeed;
-
 		Animation.x = 1515;Animation.y = 158;	
 	}
 	if (Game == true && DOWN == true)
 	{
 		Player.y += PlayerSpeed;
-		
 		Animation.x = (1515 + 38);Animation.y = 158;
 	}
 	if (Game == true && RIGHT == true)
 	{
 		Player.x += PlayerSpeed;
-
 		Animation.x = (1515 + 38);Animation.y = 0;
 	}
 	if (Game == true && LEFT == true)
 	{
 		Player.x -= PlayerSpeed;
-
 		Animation.x = 1515; Animation.y = 0;
 	}
 
+
+	if (Game == true && Ghost_UP == true)
+	{
+		Player2.y -= PlayerSpeed;
+		if (BigPellet == false)
+		{
+			GhostAnimation[0].y = 242;
+		}
+	}
+	if (Game == true && Ghost_DOWN == true)
+	{
+		Player2.y += PlayerSpeed;
+		if (BigPellet == false)
+		{
+			GhostAnimation[0].y = 79;
+		}		
+	}
+	if (Game == true && Ghost_RIGHT == true)
+	{
+		Player2.x += PlayerSpeed;
+		if (BigPellet == false)
+		{
+			GhostAnimation[0].y = 0;
+		}
+	}
+	if (Game == true && Ghost_LEFT == true)
+	{
+		Player2.x -= PlayerSpeed;
+		if (BigPellet == false)
+		{
+			GhostAnimation[0].y = 165;
+		}
+	}
+
+	if (Game == true && BigPellet == true)
+	{
+		GhostAnimation[0].x = 1266; GhostAnimation[1].x = 1266; GhostAnimation[2].x = 1266; GhostAnimation[3].x = 1266;
+		//Mix_PlayChannel(-1, SFX_EatingGhost, );
+		Sound::PlaySound(SFX_BigPellet, 2);	
+
+		//Set callback
+		SDL_TimerID timerID = SDL_AddTimer(3 * 1000, callback, "BigPellet");
+	}
+	if (Game == true && BigPellet == false)
+	{
+		GhostAnimation[0].x = RedGhost_x;
+		GhostAnimation[1].x = PinkGhost_x;
+		GhostAnimation[2].x = CyanGhost_x;
+		GhostAnimation[3].x = OrangeGhost_x;
+	}
 	//Win State
 	if (Game == true && Pellets == 0)
 	{
@@ -492,6 +664,24 @@ void updateSimulation(double simLength = 0.02) //update simulation with an amoun
 		Reset = true;
 		//Incriment Level
 		Level++;
+	}
+	if (Dead == true)
+	{
+		//Freeze Movement
+		UP = false; DOWN = false; LEFT = false; RIGHT = false;
+		Ghost_UP = false; Ghost_DOWN = false; Ghost_RIGHT = false; Ghost_LEFT = false;
+		//Play Sound Effect once.
+		
+		if (tmp == true){Sound::PlaySound(SFX_Dies, 4);	tmp = false;}
+
+		//Set callback for 
+		SDL_TimerID timerID = SDL_AddTimer(3 * 1000, callback, "Dead");
+
+	}
+	if (Died == true)
+	{
+		Lives--;
+		Died = false;
 	}
 
 	collisions();
@@ -557,6 +747,7 @@ void render()
 		//Diffrent timers for Sprites with more or less frames
 		Uint32 Pacman = (ticks / 100) % 4;
 		Uint32 Ghost = (ticks / 200) % 2;
+		Uint32 Death = (ticks / 300) % 13;
 
 
 		if (Game == true)
@@ -565,10 +756,8 @@ void render()
 			GameTimer++;
 			if (GameTimer <  220)
 			{	
-				UP = false;
-				DOWN = false;
-				RIGHT = false;
-				LEFT = false;
+				UP = false;DOWN = false;RIGHT = false;LEFT = false;
+				Ghost_UP = false; Ghost_DOWN = false; Ghost_RIGHT = false; Ghost_LEFT = false;
 
 				//Draw Ready and player text for a short time
 				Text::DrawText(ren, messageTexture[3], 225, 330, 250, 50);
@@ -624,47 +813,46 @@ void render()
 					}
 				}
 			}
-
+			
+			//Player2 	Player2.x = 325;Player2.y = 300;
+			Sprite::Draw(ren, tex, GhostAnimation[0].x, GhostAnimation[0].y + (Ghost * 40), 40, 40, Player2.x, Player2.y, Player2.w, Player2.h);
 			//Ghosts
-			Sprite::Draw(ren, tex, Ghost1, Ghost * 40, 40, 40, 280, 400, 40, 40);
-			Sprite::Draw(ren, tex, 1675, Ghost * 40, 40, 40, 320, 400, 40, 40);
-			Sprite::Draw(ren, tex, 1717, Ghost * 40, 40, 40, 360, 400, 40, 40);
-			Sprite::Draw(ren, tex, 1635, Ghost * 40, 40, 40, 400, 400, 40, 40);
+			Sprite::Draw(ren, tex, GhostAnimation[1].x, GhostAnimation[1].y +( Ghost * 40), 40, 40, GhostMove[0].x, GhostMove[0].y, GhostMove[0].w, GhostMove[0].w);
+			Sprite::Draw(ren, tex, GhostAnimation[2].x, GhostAnimation[2].y +( Ghost * 40), 40, 40, GhostMove[1].x, GhostMove[1].y, GhostMove[1].w, GhostMove[1].w);
+			Sprite::Draw(ren, tex, GhostAnimation[3].x, GhostAnimation[2].y +( Ghost * 40), 40, 40, GhostMove[2].x, GhostMove[2].y, GhostMove[2].w, GhostMove[2].w);
+			//Sprite::Draw(ren, tex, GhostAnimation[3].x, GhostAnimation[3].y + (Ghost * 40), 40, 40, 380, 400, 40, 40);
 
+			if (Dead == true)
+			{			
+				Sprite::Draw(ren, tex, 1472, 0 + (Death * 40), 38, 38, Player.x, Player.y, Player.w, Player.h);
+				//Game over text
+				if (Lives <= 0)
+				{
+					Text::DrawText(ren, messageTexture[5], 275, 475, 150, 50);
+				}
+			}
+			else
+			{
 			//Pacman
-			Sprite::Draw(ren, tex, Animation.x, Animation.y + (Pacman * 40), 38,  38, Player.x, Player.y, 42, 42);
+			Sprite::Draw(ren, tex, Animation.x, Animation.y + (Pacman * 40), 38,  38, Player.x, Player.y, Player.w, Player.h);
+			}
 
-			//Level
+			//Level  
 			if (Level > 0)
-			{	
-				//Cherry
+			{	//Cherry
 				Sprite::Draw(ren, tex, 1390, 0, 38, 38, 600, 830, 42, 42);
 			}
-			if (Level > 1)
-			{
-				//Cherry
-				Sprite::Draw(ren, tex, 1390, 40, 38, 38, 550, 830, 42, 42);
-			}
-			if (Level > 2)
-			{
-				//Cherry
-				Sprite::Draw(ren, tex, 1390, 80, 38, 38, 500, 830, 42, 42);
-			}
+			if (Level > 1)	{Sprite::Draw(ren, tex, 1390, 40, 38, 38, 550, 830, 42, 42);}
+			if (Level > 2)	{Sprite::Draw(ren, tex, 1390, 80, 38, 38, 500, 830, 42, 42);}
+			if (Level > 3) { Sprite::Draw(ren, tex, 1390, 120, 38, 38, 450, 830, 42, 42); }
+			if (Level > 4) { Sprite::Draw(ren, tex, 1390, 160, 38, 38, 400, 830, 42, 42); }
 			
 
 			//Lives
-			if (Lives > 1)
-			{
-				Sprite::Draw(ren, tex, 1515, 40, 38, 38, 50 ,830, 42, 42);
-			}
-			if (Lives > 2)
-			{
-				Sprite::Draw(ren, tex, 1515, 40, 38, 38, 100, 830, 42, 42);
-			}
-			if (Lives > 3)
-			{
-				Sprite::Draw(ren, tex, 1515, 40, 38, 38, 150, 830, 42, 42);
-			}
+			if (Lives > 1)	{Sprite::Draw(ren, tex, 1515, 40, 38, 38, 50 ,830, 42, 42);	}
+			if (Lives > 2)	{Sprite::Draw(ren, tex, 1515, 40, 38, 38, 100, 830, 42, 42);}
+			if (Lives > 3)	{Sprite::Draw(ren, tex, 1515, 40, 38, 38, 150, 830, 42, 42);}
+			if (Lives > 4) { Sprite::Draw(ren, tex, 1515, 40, 38, 38, 200, 830, 42, 42); }
 			
 		}
 		
@@ -755,6 +943,7 @@ void LoadText()
 	messageTexture[1] = Text::LoadText("./assets/Fonts/Hack-Regular.ttf", "1UP", 96, 255, 255, 255, ren);
 	messageTexture[3] = Text::LoadText("./assets/Fonts/Hack-Regular.ttf", "PLAYER ONE", 150, 73, 233, 202, ren);
 	messageTexture[4] = Text::LoadText("./assets/Fonts/Hack-Regular.ttf", "READY!", 150, 245, 255, 0, ren);
+	messageTexture[5] = Text::LoadText("./assets/Fonts/Hack-Regular.ttf", "GAMEOVER!", 150, 255, 0, 0, ren);
 
 	//Text used for the Pause menu using the TEXT class to load message onto texture array
 	PauseTexture[1] = Text::LoadText("./assets/Fonts/Hack-Regular.ttf", "Paused",	150,		255, 255, 255,  ren);
@@ -777,10 +966,15 @@ void LoadText()
 void LoadSprites()
 {	
 	//Set Players intial position
-	Player.x = Start_X;	Player.y = Start_Y;
-
+	Player.x = Start_X;	Player.y = Start_Y; Player.w = 42; Player.h = 42;
+	Player2.x = Start_X2;	Player2.y = Start_Y2; Player2.w = 40; Player2.h = 40;
 	//Set Players intial position
 	Animation.x = 1515;	Animation.y = 0;
+	
+	GhostAnimation[0].x = RedGhost_x;
+	GhostAnimation[1].x = PinkGhost_x;
+	GhostAnimation[2].x = CyanGhost_x;
+	GhostAnimation[3].x = OrangeGhost_x;
 
 	//Add Sprites to SpriteList
 	SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO, "Adding sprites...");
@@ -810,6 +1004,8 @@ void LoadSound()
 
 	SFX_OpeningSong = Sound::LoadSFX("./assets/Sound/Pacman Opening Song.mp3");
 
+	SFX_BigPellet = Sound::LoadSFX("./assets/Sound/large_pellet_loop.Wav");
+
 	SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO, "Sounds added");
 }
 
@@ -819,8 +1015,7 @@ void init()
 {
 	if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
 	{
-		std::cout << "SDL_Init Error: " << SDL_GetError() << std::endl;
-		cleanExit(1);
+		std::cout << "SDL_Init Error: " << SDL_GetError() << std::endl;	cleanExit(1);
 	}
 	std::cout << "SDL initialised OK!\n";
 
@@ -828,26 +1023,18 @@ void init()
 	//Sound Frequency, Sample format, Hardware channels
 	if (Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 2048) < 0)
 	{
-		std::cout << "SDL_mixer could not initialize! SDL_mixer Error: %s\n" << Mix_GetError() << std::endl;
-		cleanExit(1);
+		std::cout << "SDL_mixer could not initialize! SDL_mixer Error: %s\n" << Mix_GetError() << std::endl;	cleanExit(1);
 	}
-	 
 	//create window
 	win = SDL_CreateWindow("Pacman", 300, 100, ScreenSize_X, ScreenSize_Y, SDL_WINDOW_SHOWN);
 
 	//error handling
-	if (win == nullptr)
-	{
-		std::cout << "SDL_CreateWindow Error: " << SDL_GetError() << std::endl;
-		cleanExit(1);
-	}
+	if (win == nullptr){	std::cout << "SDL_CreateWindow Error: " << SDL_GetError() << std::endl;	cleanExit(1);	}
+
 	std::cout << "SDL CreatedWindow OK!\n";
 
 	//Initialize SDL_ttf
-	if (TTF_Init() == -1)
-	{
-		cleanExit(1);
-	}
+	if (TTF_Init() == -1){	cleanExit(1);	}
 
 	//turning V Sync On 
 	ren = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
@@ -855,10 +1042,6 @@ void init()
 		std::cout << "SDL_CreateRenderer Error: " << SDL_GetError() << std::endl;
 		cleanExit(1);
 	}
-	//Turning V Sync off
-	//ren = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED );
-
-	
 }
 
 

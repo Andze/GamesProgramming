@@ -16,6 +16,10 @@ public:
 
 	static bool PlaySound(Mix_Chunk *SFX, int channel);
 
+	static bool SetVolume(int Volume);
+
+	static bool PauseMusic(Mix_Music *Music, int Volume);
+
 	~Sound();
 };
 
